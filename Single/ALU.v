@@ -1,36 +1,32 @@
+module ALU(A,B,Sign,ALUFun,Z);
+input [31:0] A, B;
+input Sign;
+input [5:0] ALUFun;
+output reg [31:0] Z;
 
-module ALU(in1, in2, ALUCtl, Sign, out, zero);
-	input [31:0] in1, in2;
-	input [4:0] ALUCtl;
-	input Sign;
-	output reg [31:0] out;
-	output zero;
-	
-	assign zero = (out == 0);
-	
-	wire ss;
-	assign ss = {in1[31], in2[31]};
-	
-	wire lt_31;
-	assign lt_31 = (in1[30:0] < in2[30:0]);
-	
-	wire lt_signed;
-	assign lt_signed = (in1[31] ^ in2[31])? 
-		((ss == 2'b01)? 0: 1): lt_31;
-	
-	always @(*)
-		case (ALUCtl)
-			5'b00000: out <= in1 & in2;
-			5'b00001: out <= in1 | in2;
-			5'b00010: out <= in1 + in2;
-			5'b00110: out <= in1 - in2;
-			5'b00111: out <= {31'h00000000, Sign? lt_signed: (in1 < in2)};
-			5'b01100: out <= ~(in1 | in2);
-			5'b01101: out <= in1 ^ in2;
-			5'b10000: out <= (in2 << in1[4:0]);
-			5'b11000: out <= (in2 >> in1[4:0]);
-			5'b11001: out <= ({{32{in2[31]}}, in2} >> in1[4:0]);
-			default: out <= 32'h00000000;
+             always @(*)
+		case (ALUFun)
+// compute
+			6'b000000: Z <= A + B;
+                        6'b000001: Z <= A - B;
+// logic
+                        6'b011000: Z <= A & B;
+                        6'b011110: Z <= A | B;
+                        6'b010110: Z <= A ^ B;
+                        6'b010001: Z <=~(A|B);
+                        6'b011010: Z <= A    ;
+//changeposition
+			6'b100000: Z <= (B << A[4:0]);
+			6'b100001: Z <= (B >> A[4:0]);
+			6'b100011: Z <= ({{32{B[31]}}, B} >> A[4:0]);
+//corleration
+			6'b110011: Z <= (A==B)?8'hffffffff:8'h00000000;
+			6'b110001: Z <= (A!=B)?8'hffffffff:8'h00000000;
+			6'b110101: Z <= (A<B)?8'hffffffff:8'h00000000;
+			6'b111101: Z <= (A<=8'h00000000)?8'hffffffff:8'h00000000;
+			6'b111011: Z <= (A<8'h00000000)?8'hffffffff:8'h00000000;
+			6'b111111: Z <= (A>8'h00000000)?8'hffffffff:8'h00000000;
+			default: Z <= 32'h00000000;
 		endcase
-	
+
 endmodule
