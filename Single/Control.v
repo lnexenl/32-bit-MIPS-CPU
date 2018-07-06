@@ -21,25 +21,23 @@ module Control(OpCode, Funct,
 				   (OpCode >= 6'h02 && OpCode <= 6'h03)?3'd2:
 				   (Funct >= 6'h08 && Funct <= 6'h09)?3'd3:3'd0
 	
-	assign Branch = (OpCode == 6'h04)?1:0;
+	assign RegWrite = (OpCode == 6'h2b || (OpCode >= 6'h04 && OpCode <= 6'h07) || OpCode == 6'h02 || OpCode == 6'h01 || (OpCode == 0 && Funct == 6'h08))?0:1;
 
-	assign RegWrite = (OpCode == 6'h2b || OpCode == 6'h04 || OpCode == 6'h02|| (OpCode == 0 && Funct == 6'h08))?0:1;
-
-	assign RegDst = (OpCode == 6'h03)?2'b10:
-					(OpCode == 6'b0)?2'b01:2'b00;
+	assign RegDst = (OpCode == 6'h03)?2'd2:
+					(OpCode == 6'h00)?2'd0:2'd1;
 	
 	assign MemRead = (OpCode == 6'h23)? 1: 0;
 
 	assign MemWrite = (OpCode == 6'h2b)? 1: 0;
 
-	assign MemtoReg = (OpCode == 6'h03 || (OpCode == 6'h00 && Funct == 6'h09))?2'b10:
-					  (OpCode == 6'h23)?2'b01:2'b00;
+	assign MemtoReg = (OpCode == 6'h03 || (OpCode == 6'h00 && Funct == 6'h09))?2'd2:
+					  (OpCode == 6'h23)?2'd1:2'd0;
 
-	assign ALUSrc1 = (OpCode == 6'h00 && (Funct == 6'h00||Funct == 6'h02||Funct == 6'h03))? 1: 0;
+	assign ALUSrc1 = (OpCode == 6'h00 && (Funct == 6'h00||Funct == 6'h02||Funct == 6'h03))
 
-	assign ALUSrc2 = (OpCode == 6'h00||OpCode == 6'h04)?0:1;
+	assign ALUSrc2 = ~(OpCode >= 6'h00 && OpCode <= 6'h07)
 
-	assign ExtOp = (OpCode == 6'h23||OpCode == 6'h2b||OpCode == 6'h08||OpCode == 6'h09||OpCode == 6'h0c||OpCode == 6'h0a||OpCode == 6'h04)?1:0;
+	assign ExtOp = (OpCode == 6'h23||OpCode == 6'h2b||OpCode == 6'h08||OpCode == 6'h0a||(OpCode >= 6'h04 && OpCode <= 6'h07)||OpCode == 6'h01)?1:0;
 
 	assign LuOp = (OpCode == 6'h0f)?1:0;
 	

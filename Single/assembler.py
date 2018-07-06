@@ -3,7 +3,7 @@ Registers = ['zero', 'at', 'v0', 'v1', 'a0', 'a1', 'a2', 'a3', 't0', 't1', 't2',
 OpCode = { 'nop':0, 'lw':35, 'sw':43, 'lui':15, 'add':0, 'addu':0, 'sub':0, 'subu':0, 'addi':8, 'addiu':9, 'and':0, 'or':0, 'xor':0, 'nor':0, 'andi':12, 'sll':0, 'srl':0, 'sra':0, 'slt':0, 'slti':10, 'sltiu':11, 'beq':4, 'bne':5, 'blez':6, 'bgtz':7, 'bltz':1, 'j':2, 'jal':3, 'jr':0, 'jalr':0}
 funct = { 'nop':0, 'add':32, 'addu':33, 'sub':34, 'subu':35, 'and':36, 'or':37, 'xor':38, 'nor':39, 'sll':0, 'srl':2, 'sra':3, 'slt':42, 'jr':8, 'jalr':9}
 MIPSFile = open('./test.v')
-def MIPS_code2machine_code(line, label):
+def MIPS_code2machine_code(line, label, i):
     try:
         x = re.match(r':?(add|addu|sub|subu|and|or|xor|nor|slt)[ ]+\$(.+)[ ]*,[ ]*\$(.+)[ ]*,[ ]*\$(.+)', line) #有三个寄存器的指令
         if x:
@@ -11,6 +11,9 @@ def MIPS_code2machine_code(line, label):
         x = re.match(r'.*:?(lw|sw)[ ]+\$(.+)[ ]*,[ ]*([0-9]+)\(\$(.+)\)', line) #lw, sw
         if x:
             return hex((OpCode[x.group(1)] << 26) + (Registers.index(x.group(4)) << 21) + (Registers.index(x.group(2)) << 16) + int(x.group(3)))
+        x = re.match(r'.*:?(beq|bne)[ ]+\$(.+)[ ]*,[ ]*\$(.+)[ ]*,[ ]*(.+)', line)
+        if x:
+            return hex((OpCode[x.group(1)] << 26) + (Registers.index(x.group(2)) << 21) + (Registers.index(x.group(3)) << 16) + i - label[x.group(4)])
         x = re.match(r'.*:?(addi|addiu|andi|slti|sltiu|beq|bne)[ ]+\$(.+)[ ]*,[ ]*\$(.+)[ ]*,[ ]*([0-9]+)', line) #含有offset和imm的指令（lw, sw除外）
         if x:
             return hex((OpCode[x.group(1)] << 26) + (Registers.index(x.group(2)) << 21) + (Registers.index(x.group(3)) << 16) + int(x.group(4)))
@@ -48,8 +51,10 @@ for line in MIPSFile:
         if(not l.groups(2)): index = index + 1
     else:index = index + 1
 MIPSFile.seek(0)
+index = 0
 for line in MIPSFile:
-    res = MIPS_code2machine_code(line, label)
+    res = MIPS_code2machine_code(line, label, index)
     if res != 'none':
         MachineCodeFile.write(res)
         MachineCodeFile.write('\n')
+        index = index + 1
