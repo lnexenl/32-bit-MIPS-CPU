@@ -55,4 +55,18 @@ module Control(OpCode, Funct,
 		
 	assign ALUOp[3] = OpCode[0];
 	
+	assign ALUFun = (Funct == 6'h22 || Funct == 6'h23)?6'b000001:
+					(Funct == 6'h24 || OpCode == 6'h0c)?6'b011000:
+					(Funct == 6'h25)?6'b011110:
+					(Funct == 6'h26)?6'b010110:
+					(Funct == 6'h27)?6'b010001:
+					(Funct == 6'h00 && OpCode == 6'h00)?6'b100000:
+					(Funct == 6'h02)?6'b100001:
+					(Funct == 6'h03)?6'b100011:
+					(OpCode == 6'h04)?6'b110011:
+					(OpCode == 6'h05)?6'b110001:
+					(OpCode == 6'h0a || OpCode == 6'h0b || Funct == 6'h2a)?6'b110101:
+					(OpCode == 6'h06)?6'b111101:
+					(OpCode == 6'h07)?6'b111011:
+					(OpCode == 6'h01)?6'b111111:6'b000000
 endmodule
