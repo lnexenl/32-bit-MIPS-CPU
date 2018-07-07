@@ -1,4 +1,3 @@
-
 module CPU(reset, clk);
 	input reset, clk;
 	
