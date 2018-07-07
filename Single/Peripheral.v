@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 
-module Peripheral (reset,clk,rd,wr,addr,wdata,rdata,led,switch,digi,irqout);
-input reset,clk;
-input rd,wr;
+module PeripheralMem (reset, clk, rd, wr, addr, wdata, rdata, led, switch, digi, irqout, UART_RXD, UART_TXD, TX_STATUS, RX_END, TX_END);
+input reset, clk;
+input rd, wr;
 input [31:0] addr;
 input [31:0] wdata;
 output [31:0] rdata;
@@ -19,7 +19,17 @@ reg [31:0] TH,TL;
 reg [2:0] TCON;
 assign irqout = TCON[2];
 
+input TX_STATUS, RX_END, TX_END;
+input [7:0]UART_RXD;
+reg [7:0] UART_RXD;
+output [7:0] UART_TXD;
+reg [7:0] UART_TXD;
+reg [4:0] UART_CON;
+
 always@(*) begin
+	UART_CON[4] <= TX_STATUS;
+	if (RX_END) UART_CON[3] <= 1;
+	if (TX_END) UART_CON[2] <= 1;
 	if(rd) begin
 		case(addr)
 			32'h40000000: rdata <= TH;			
@@ -28,6 +38,11 @@ always@(*) begin
 			32'h4000000C: rdata <= {24'b0,led};			
 			32'h40000010: rdata <= {24'b0,switch};
 			32'h40000014: rdata <= {20'b0,digi};
+			32'h4000001C: rdata <= {24'b0,UART_RXD};
+			32'h40000020: begin 
+							rdata <= {27'b0,UART_CON};
+							UART_CON[3:2] <= 2'b00;
+						  end
 			default: rdata <= 32'b0;
 		endcase
 	end
@@ -57,6 +72,8 @@ always@(negedge reset or posedge clk) begin
 				32'h40000008: TCON <= wdata[2:0];		
 				32'h4000000C: led <= wdata[7:0];			
 				32'h40000014: digi <= wdata[11:0];
+				32'h40000018: UART_TXD <= wdata[7:0];
+				32'h40000020: UART_CON <= wdata[4:0];
 				default: ;
 			endcase
 		end

@@ -1,6 +1,9 @@
 
-module CPU(reset, clk);
-	input reset, clk;
+module CPU(reset, clk, clk_Baud, led, switch, UART_TX, UART_RX);
+	input reset, clk, clk_Baud, UART_RX;
+	input [7:0] switch;
+	output UART_TX;
+	output [7:0] led;
 	
 	reg [31:0] PC;
 	wire [31:0] PC_next;
@@ -31,6 +34,7 @@ module CPU(reset, clk);
 	wire ker;
 	wire IRQ;
 	wire sign;
+	wire [11:0] digi;
 	
 	Control control1(
 		.OpCode(Instruction[31:26]), .Funct(Instruction[5:0]), .ker(ker), .IRQ(IRQ),
@@ -61,12 +65,13 @@ module CPU(reset, clk);
 	ALU alu1(.A(ALU_in1), .B(ALU_in2), .Sign(sign), .ALUFun(ALUFun), .z(ALU_out));
 	
 	wire [31:0] Read_data;
-	DataMemory data_memory1(
-		.reset(reset), .clk(clk), .Address(ALU_out), .Write_data(Databus2),
-		.Read_data(Read_data), .MemRead(MemRead), .MemWrite(MemWrite));
-	assign Databus3 = (MemtoReg == 2'b00)? ALU_out:
-					  (MemtoReg == 2'b01)? Read_data:
-					  PC_plus_4;
+	DataMem data_mem1(
+		.reset(reset), .clk(clk), .rd(MemRead & ~ALU_out[30]), .wr(MemWrite & ~ALU_out[30]),
+		.addr(ALU_out), .wdata(Databus2), .rdata(Read_data));
+	PeripheralDevice peride(
+		.reset(reset), .clk(clk), .clk_Baud(clk_Baud), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
+		.wdata(Databus2), .rdata(Read_data), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ));
+	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: PC_plus_4;
 	
 	wire [31:0] Jump_target;
 	assign Jump_target = {PC_plus_4[31:28], Instruction[25:0], 2'b00};
