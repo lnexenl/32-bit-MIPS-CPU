@@ -1,10 +1,12 @@
-module Control(OpCode, Funct,
+module Control(OpCode, Funct, ker, IRQ,
 	PCSrc, RegWrite, RegDst, 
 	MemRead, MemWrite, MemtoReg, 
-	ALUSrc1, ALUSrc2, ExtOp, LuOp, Interrupt, ker, IRQ);
+	ALUSrc1, ALUSrc2, ExtOp, LuOp, ALUFun);
 	input [5:0] OpCode;
 	input [5:0] Funct;
-	output [1:0] PCSrc;
+	input ker;
+	input IRQ;
+	output [2:0] PCSrc;
 	output RegWrite;
 	output [1:0] RegDst;
 	output MemRead;
@@ -14,8 +16,9 @@ module Control(OpCode, Funct,
 	output ALUSrc2;
 	output ExtOp;
 	output LuOp;
-	output Interrupt;
+	output [5:0] ALUFun;
 	wire Exception;
+	wire Interrupt;
 	assign Exception = ~((OpCode == 6'h0 &&(Funct == 6'h0 || (Funct >= 6'h20 && Funct <= 6'h27) || Funct == 6'h02 || Funct == 6'h03 || Funct == 6'h2a || Funct == 6'h08 || Funct == 6'h09)) || (OpCode >= 6'h01 && OpCode <= 6'h0c) || OpCode == 6'h0f || OpCode == 6'h23 || OpCode == 6'h2b)
 	assign Interrupt = IRQ&&(~ker)
 	assign PCSrc = (OpCode == 6'h01 || (OpCode >= 6'h04 && OpCode <= 6'h07))?3'd1:
