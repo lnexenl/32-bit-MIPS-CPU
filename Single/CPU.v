@@ -1,10 +1,8 @@
-
 module CPU(reset, clk, clk_Baud, led, switch, UART_TX, UART_RX);
 	input reset, clk, clk_Baud, UART_RX;
 	input [7:0] switch;
 	output UART_TX;
-	output [7:0] led;
-	
+	output [7:0] led;	
 	reg [31:0] PC;
 	wire [31:0] PC_next;
 	always @(posedge reset or posedge clk)
