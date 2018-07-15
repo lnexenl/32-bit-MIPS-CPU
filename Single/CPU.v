@@ -1,5 +1,5 @@
-module CPU(reset, clk, clk_Baud, led, switch, UART_TX, UART_RX);
-	input reset, clk, clk_Baud, UART_RX;
+module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
+	input reset, clk, sysclk, UART_RX;
 	input [7:0] switch;
 	output UART_TX;
 	output [7:0] led;	
