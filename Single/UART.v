@@ -1,12 +1,12 @@
-module UART(sysclk, PC_Uart_rxd, PC_Uart_txd, RX_DATA, TX_DATA, led, ctrl);
+module UART(sysclk, PC_Uart_rxd, PC_Uart_txd, RX_DATA, TX_DATA, led, ctrl, RX_STATUS, TX_STATUS);
 input sysclk, PC_Uart_rxd, ctrl;
 output led, PC_Uart_txd;
 output wire [7:0]RX_DATA;
+output wire TX_STATUS;
 input wire [7:0]TX_DATA;
 wire [7:0]RX_SAVE;
 wire sysclk_bd, sysclk_sam,  RX_STATUS;
 wire [7:0] led;
-wire TX_STATUS;
 reg TX_EN;
 initial begin
     TX_EN = 0;

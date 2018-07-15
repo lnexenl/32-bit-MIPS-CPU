@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module PeripheralMem (reset, clk, rd, wr, addr, wdata, rdata, led, switch, digi, irqout, RX_DATA, TX_DATA, TX_STATUS, RX_END, TX_END);
+module PeripheralMem (reset, clk, rd, wr, addr, wdata, rdata, led, switch, digi, irqout, RX_DATA, TX_DATA, RX_STATUS, TX_STATUS, ctrl);
 input reset, clk;
 input rd, wr;
 input [31:0] addr;
@@ -19,18 +19,23 @@ reg [31:0] TH,TL;
 reg [2:0] TCON;
 assign irqout = TCON[2];
 
-input TX_STATUS, RX_END, TX_END;
+input TX_STATUS, RX_STATUS;
+output wire ctrl;
 
-input [7:0]RX_DATA;
-reg [7:0]RX_DATA;
-output [7:0]TX_DATA;
-reg [7:0]TX_DATA;
-reg [4:0] UART_CON;
+input [7:0] RX_DATA;
+reg [7:0] RX_DATA;
+output [7:0] TX_DATA;
+reg [7:0] TX_DATA;
+reg UART_SEND, UART_CONR;
+ctrl = assign UART_SEND;
+
+initial begin
+	UART_CONR = 0;
+	UART_SEND = 0;
+end
 
 always@(*) begin
-	UART_CON[4] <= TX_STATUS;
-	if (RX_END) UART_CON[3] <= 1;
-	if (TX_END) UART_CON[2] <= 1;
+	if (RX_STATUS) UART_CONR <= 1;	
 	if(rd) begin
 		case(addr)
 			32'h40000000: rdata <= TH;			
@@ -42,8 +47,8 @@ always@(*) begin
 			32'h40000018: rdata <= {24'b0,TX_DATA};
 			32'h4000001C: rdata <= {24'b0,RX_DATA};
 			32'h40000020: begin 
-							rdata <= {27'b0,UART_CON};
-							UART_CON[3:2] <= 2'b00;
+							rdata <= {30'b0, UART_CONR, TX_STATUS};
+							UART_CONR <=0;
 						  end
 			default: rdata <= 32'b0;
 		endcase
@@ -56,7 +61,10 @@ always@(negedge reset or posedge clk) begin
 	if(~reset) begin
 		TH <= 32'b0;
 		TL <= 32'b0;
-		TCON <= 3'b0;	
+		TCON <= 3'b0;
+		led <= 8'b0;
+		digi <= 12'b0;
+		UART_SEND <= 0;
 	end
 	else begin
 		if(TCON[0]) begin	//timer is enabled
@@ -66,7 +74,6 @@ always@(negedge reset or posedge clk) begin
 			end
 			else TL <= TL + 1;
 		end
-		
 		if(wr) begin
 			case(addr)
 				32'h40000000: TH <= wdata;
@@ -76,13 +83,12 @@ always@(negedge reset or posedge clk) begin
 				32'h40000014: digi <= wdata[11:0];
 				32'h40000018: begin
 					TX_DATA <= wdata[7:0];
-					UART_CON[1] <= 1;
+					UART_SEND <= 1;
 				end
-				32'h40000020: UART_CON <= wdata[4:0];
 				default: ;
 			endcase
 		end
-		if (UART_CON[1] == 1) UART_CON[1] <= 0;
+		if (UART_SEND) UART_SEND <= 0;
 	end
 end
 endmodule
