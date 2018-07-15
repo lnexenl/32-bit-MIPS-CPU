@@ -1,16 +1,18 @@
-# .data
-# .align 2
-# 	input_file: .asciiz "./gcd.in"
-# 	output_file: .asciiz "./gcd.out"
-# 	a: .space 4
-# 	b: .space 4
-# .text
-# 	li $v0, 5
-# 	syscall
-# 	move $s0, $v0
-# 	li $v0, 5
-# 	syscall
-# 	move $s1, $v0
+j main
+j interrupt
+j exception
+
+#定时器设置
+addi $t1, $zero, -1000
+lui $t0, 0x4000
+sw $t1, 0($t0)
+addi $t0, $t0, 0x0004
+sw $t1, 0($t0)
+addi $t0, $t0, 0x0004
+sw $zero, 0($t0)
+
+
+main:
 	addi $t7, $zero, 1
 	j judge
 shift:
