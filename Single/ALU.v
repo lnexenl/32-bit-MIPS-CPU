@@ -10,84 +10,20 @@ wire [31:0] add;
 wire [31:0] jian;
 wire [32:0] IN1=9'h000000000;
 wire [32:0] IN2=9'h000000000;
-wire [32:0] OUT=9'h000000000;
+wire [32:0] OUT1=9'h000000000;
+wire [32:0] OUT2=9'h000000000;
 //如果溢出就直接溢出位就可以了
-assign
-{
-	if(Sign==1'b1)
-	{
-		add <= A + B;
-		jian <=A - B;
-	if(add[31]==1'b1)
-	{
-		N1 <= 1'b1;//负数
-	}
-	else
-	{
-		N1 <= 1'b0;//正数
-	}
-	if(jian[31]==1'b1)
-	{
-		N2 <= 1'b1;//负数
-	}
-	else
-	{
-		N2 <= 1'b0;//正数
-	}
-	IN1 <= 9'h000000000;
-	IN2 <= 9'h000000000;
-	OUT <= 9'h000000000;
-	IN1[31:0] <= A;
-	IN2[31:0] <= B;
-	OUT <= IN1 + IN2;
-	if(OUT[32] == 1'b1)
-	{
-		V1 <= 1'b1;
-	}
-	else
-	{
-		V1 <= 1'b0;
-	}
-	OUT <= IN1 - IN2;
-	if(OUT[32] == 1'b1)
-	{
-		V2 <= 1'b1;
-	}
-	else
-	{
-		V2 <= 1'b0;
-	}
-	}
-	else
-	{
-	add <= A + B;
-	jian <= A - B;
-	IN1 <= 9'h000000000;
-	IN2 <= 9'h000000000;
-	OUT <= 9'h000000000;
-	IN1[31:0] <= A;
-	IN2[31:0] <= B;
-	OUT <= IN1 + IN2;
-	if(OUT[32] == 1'b1)
-	{
-		V1 <= 1'b1;
-	}
-	else
-	{
-		V1 <= 1'b0;
-	}
-	OUT <= IN1 - IN2;
-	if(OUT[32] == 1'b1)
-	{
-		V2 <= 1'b1;
-	}
-	else
-	{
-		V2 <= 1'b0;
-	}
-	N2 <= 1'b0;
-	}
-}
+assign add = A + B;
+assign jian = A - B;
+assign IN1[31:0] = A;
+assign IN2[31:0] = B;
+assign OUT1 = IN1 + IN2;
+assign OUT2 = IN1 - IN2;
+assign N1 = (Sign==1'b1&&add[31]==1'b1)?1'b1:1'b0;
+assign N2 = (Sign==1'b1&&jian[31]==1'b1)?1'b1:1'b0;
+assign V1 = (OUT1[32]==1'b1)?1'b1:1'b0;
+assign V2 = (OUT2[32]==1'b1)?1'b1:1'b0;
+
 	always @(*)
 		case (ALUFun)
 // compute
