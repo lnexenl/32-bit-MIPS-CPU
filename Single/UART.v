@@ -33,18 +33,19 @@ module UART_receiver(
 input PC_UART_rxd, sam;
 output reg [7:0]RX_DATA;
 output reg [7:0]RX_SAVE;
-output reg RX_STATUS = 0;
+output reg RX_STATUS = 1;
 reg [3:0]cnt = 0;
 reg [3:0] RX = 0;
 reg RX_EN = 0;
 always @(posedge sam)
 begin
-    if((~RX_EN) & (~PC_UART_rxd) & (~RX_STATUS))
+    if((~RX_EN) & (~PC_UART_rxd) & (RX_STATUS))
     begin
       if(cnt == 8)
       begin
           cnt = 0;
           RX_EN = 1;
+          RX_STATUS = 0;
       end
       else cnt = cnt + 1;
     end
@@ -62,13 +63,12 @@ begin
             RX = 0;
             RX_EN = 0;
             cnt = 0;
-            RX_STATUS = 1;
         end
     end
     else
     begin
         if(PC_UART_rxd)
-            RX_STATUS = 0;
+            RX_STATUS = 1;
     end
 end
 endmodule
