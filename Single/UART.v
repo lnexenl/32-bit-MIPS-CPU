@@ -1,8 +1,8 @@
-module UART(sysclk, PC_Uart_rxd, PC_Uart_txd, led, ctrl);
+module UART(sysclk, PC_Uart_rxd, PC_Uart_txd, RX_DATA, TX_DATA, led, ctrl);
 input sysclk, PC_Uart_rxd, ctrl;
 output led, PC_Uart_txd;
-wire [7:0]RX_DATA;
-wire [7:0]TX_DATA;
+output wire [7:0]RX_DATA;
+input wire [7:0]TX_DATA;
 wire [7:0]RX_SAVE;
 wire sysclk_bd, sysclk_sam,  RX_STATUS;
 wire [7:0] led;
