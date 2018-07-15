@@ -1,19 +1,18 @@
-.data
-.align 2
-	input_file: .asciiz "./gcd.in"
-	output_file: .asciiz "./gcd.out"
-	a: .space 4
-	b: .space 4
-.text
-	li $v0, 5
-	syscall
-	move $s0, $v0
-	li $v0, 5
-	syscall
-	move $s1, $v0
+# .data
+# .align 2
+# 	input_file: .asciiz "./gcd.in"
+# 	output_file: .asciiz "./gcd.out"
+# 	a: .space 4
+# 	b: .space 4
+# .text
+# 	li $v0, 5
+# 	syscall
+# 	move $s0, $v0
+# 	li $v0, 5
+# 	syscall
+# 	move $s1, $v0
 	addi $t7, $zero, 1
 	j judge
-	
 shift:
 	beq $t0, $zero, a_shift
 	beq $t1, $zero, b_shift
@@ -23,7 +22,6 @@ a_shift:
 b_shift:
 	srl $s1, $s1, 1
 	j judge
-
 judge:
 	andi $t0, $s0, 1
 	andi $t1, $s1, 1
@@ -42,6 +40,6 @@ b_s:
 	beq $s0, $s1, end
 	j judge
 end:
-	li $v0, 1
-	move $a0, $s0
-	syscall
+	# li $v0, 1
+	# move $a0, $s0
+	# syscall
