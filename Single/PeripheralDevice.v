@@ -1,5 +1,5 @@
-module PeripheralDevice(reset, sysclk, clk, rd, wr, addr, wdata, rdata, led, switch, UART_RX, UART_TX, irqout, BCD, DK);
-input reset, sysclk, clk, clk_Baud, rd, wr, UART_RX;
+module PeripheralDevice(reset, clk, sysclk, sysclk_bd, sysclk_sam, rd, wr, addr, wdata, rdata, led, switch, UART_RX, UART_TX, irqout, BCD, DK);
+input reset, clk, sysclk, sysclk_bd, sysclk_sam, rd, wr, UART_RX;
 input [7:0] switch;
 input [31:0] addr;
 input [31:0] wdata;
@@ -15,8 +15,6 @@ wire [11:0] digi;
 
 assign DK = digi[11:8];
 assign BCD = digi[6:0];
-
-UART_BR br(sysclk, sysclk_bd, sysclk_sam, sysclk_25M);
 UART uart(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .PC_Uart_rxd(UART_RX), .PC_Uart_txd(UART_TX), .RX_DATA(RX_DATA), .TX_DATA(TX_DATA), .ctrl(ctrl), .RX_STATUS(RX_STATUS), .TX_STATUS(TX_STATUS), .digi(digi));
 Peripheral peri(
 	.reset(reset), .clk(clk), .rd(rd), .wr(wr), .addr(addr), .wdata(wdata), .rdata(rdata),
