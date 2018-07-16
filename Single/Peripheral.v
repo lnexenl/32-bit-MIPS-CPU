@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module PeripheralMem (reset, clk, rd, wr, addr, wdata, rdata, led, switch, digi, irqout, RX_DATA, TX_DATA, RX_STATUS, TX_STATUS, ctrl);
+module Peripheral (reset, clk, rd, wr, addr, wdata, rdata, led, switch, digi, irqout, RX_DATA, TX_DATA, RX_STATUS, TX_STATUS, ctrl);
 input reset, clk;
 input rd, wr;
 input [31:0] addr;
