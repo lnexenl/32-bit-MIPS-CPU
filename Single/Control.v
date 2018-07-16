@@ -64,5 +64,5 @@ module Control(OpCode, Funct, ker, IRQ,
 					(OpCode == 6'h07)?6'b111011:
 					(OpCode == 6'h01)?6'b111111:6'b000000;
 	
-	assign sign = (OpCode)?0:1; //to be continued
+	assign sign = (OpCode == 6'h0b)?0:1;
 endmodule
