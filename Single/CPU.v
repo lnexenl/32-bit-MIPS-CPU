@@ -7,7 +7,7 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 	wire [31:0] PC_next;
 	always @(posedge reset or posedge clk)
 		if (reset)
-			PC <= 32'h00000000;
+			PC <= 32'h80000000;
 		else
 			PC <= PC_next;
 	
@@ -15,7 +15,7 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 	assign PC_plus_4 = PC + 32'd4;
 	
 	wire [31:0] Instruction;
-	InstructionMemory instruction_memory1(.Address(PC), .Instruction(Instruction));
+	ROM rom1(.addr({1'b0,PC[30:0]}), .data(Instruction));
 	
 	wire [2:0] PCSrc;
 	wire [1:0] RegDst;
@@ -29,13 +29,12 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 	wire ALUSrc2;
 	wire RegWrite;
 	wire interrupt;
-	wire ker;
 	wire IRQ;
 	wire sign;
 	wire [11:0] digi;
 	
 	Control control1(
-		.OpCode(Instruction[31:26]), .Funct(Instruction[5:0]), .ker(ker), .IRQ(IRQ),
+		.OpCode(Instruction[31:26]), .Funct(Instruction[5:0]), .ker(PC[31]), .IRQ(IRQ),
 		.PCSrc(PCSrc), .RegWrite(RegWrite), .RegDst(RegDst), 
 		.MemRead(MemRead),	.MemWrite(MemWrite), .MemtoReg(MemtoReg),
 		.ALUSrc1(ALUSrc1), .ALUSrc2(ALUSrc2), .ExtOp(ExtOp), .LuOp(LuOp), .ALUFun(ALUFun), .sign(sign));
@@ -62,13 +61,15 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 	assign ALU_in2 = ALUSrc2? LU_out: Databus2;
 	ALU alu1(.A(ALU_in1), .B(ALU_in2), .Sign(sign), .ALUFun(ALUFun), .z(ALU_out));
 	
-	wire [31:0] Read_data;
+	wire [31:0] Read_data, rdata1, rdata2;
 	DataMem data_mem1(
 		.reset(reset), .clk(clk), .rd(MemRead & ~ALU_out[30]), .wr(MemWrite & ~ALU_out[30]),
-		.addr(ALU_out), .wdata(Databus2), .rdata(Read_data));
+		.addr(ALU_out), .wdata(Databus2), .rdata(rdata1));
 	PeripheralDevice peride(
-		.reset(reset), .clk(clk), .clk_Baud(clk_Baud), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
-		.wdata(Databus2), .rdata(Read_data), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ));
+		.reset(reset), .sysclk(sysclk), .clk(clk), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
+		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ));
+	assign Read_data = ALU_out[30]? rdata2: rdata1;
+		
 	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: PC_plus_4;
 	
 	wire [31:0] Jump_target;
