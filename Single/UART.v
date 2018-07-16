@@ -5,7 +5,8 @@ output wire [7:0]RX_DATA;
 output wire TX_STATUS;
 input wire [7:0]TX_DATA;
 wire [7:0]RX_SAVE;
-wire sysclk, sysclk_bd, sysclk_sam, RX_STATUS;
+wire sysclk, 
+sysclk_bd, sysclk_sam, RX_STATUS;
 wire [7:0] led;
 wire [11:0] digi;
 reg TX_EN;

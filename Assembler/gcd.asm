@@ -2,7 +2,7 @@ j main
 j interrupt
 j exception
 
-#定时器设置
+#timer setting
 addi $t1, $zero, -1000
 lui $t0, 0x4000
 sw $t1, 0($t0)
@@ -42,24 +42,24 @@ b_s:
 	beq $s0, $s1, end
 	j judge
 end:
-	# li $v0, 1
-	# move $a0, $s0
-	# syscall
 #$t0, $t1, $t2, $t7, $s0, $s1, $a0, $v0
 exception:
 	jr $k1
-#中断
+#interrupt
 interrupt:
 	lui $s2, 0x4000
-	addi $s2, 8
-	lw $s3, 0($s2) #s3 = tcon
-	addi $s4, $0, -7
+	addi $s2, $s2, 8
+	lw $s3, 0($s2) 
+	#s3 = tcon
+	addi $s4, $zero, -7
 	and $s3, $s3, $s4
 	sw $s3, 0($s2)
-	addi $s2, $s2, 12 #s2 = 0x40000014 #开始更新
+	addi $s2, $s2, 12 
+	#s2 = 0x40000014 #start updating
 	lw $s3,0($s2)
-	andi $s3, $s3, 0x0f00 #s3 = digi高位
-	addi $s4, $0, 0x0100
+	andi $s3, $s3, 0x0f00 
+	#s3 = digi high
+	addi $s4, $zero, 0x0100
 	beq $s3, $s4, num12
 	sll $s4, $s4, 1
 	beq $s3, $s4, num21
@@ -68,27 +68,34 @@ interrupt:
 	sll $s4, $s4, 1
 	beq $s3, $s4, num11
 num11:
-	srl $s4, $s4, 3 #s4 = 新digi高位
-	andi $t4, $s0, 0x000f #t4 = s0低位
-	jal bcd #t4 = 新digi低位
+	srl $s4, $s4, 3 
+	#s4 = new digi high
+	andi $t4, $s0, 0x000f 
+	#t4 = s0 low
+	jal bcd
+	#t4 = new digi low
 	j restore
 num12:
 	sll $s4, $s4, 1
-	andi $t4, $s0, 0x00f0 #t4 = s0高位
+	andi $t4, $s0, 0x00f0
+	#t4 = s0 high
 	jal bcd
 	j restore
 num21:
 	sll $s4, $s4, 1
-	andi $t4, $s1, 0x000f #t4 = s1低位
+	andi $t4, $s1, 0x000f
+	#t4 = s1 low
 	jal bcd
 	j restore
 num22:
 	sll $s4, $s4, 1
-	andi $t4, $s1, 0x00f0 #t4 = s1高位
+	andi $t4, $s1, 0x00f0
+	#t4 = s1 high
 	jal bcd
 	j restore
 bcd:
-	add $s3, $0, $0 #s3计数
+	add $s3, $zero, $zero
+	#s3 counting
 	beq $t4, $s3, d0
 	addi $s3, $s3, 1
 	beq $t4, $s3, d1
@@ -118,60 +125,62 @@ bcd:
 	beq $t4, $s3, d13
 	addi $s3, $s3, 1
 	beq $t4, $s3, d14
-	addi $t4, $0, 0x0071
+	addi $t4, $zero, 0x0071
 	jr $ra
 d0:
-	addi $t4, $0, 0x003f
+	addi $t4, $zero, 0x003f
 	jr $ra
 d1:
-	addi $t4, $0, 0x0006
+	addi $t4, $zero, 0x0006
 	jr $ra
 d2:
-	addi $t4, $0, 0x005b
+	addi $t4, $zero, 0x005b
 	jr $ra
 d3:
-	addi $t4, $0, 0x004f
+	addi $t4, $zero, 0x004f
 	jr $ra
 d4:
-	addi $t4, $0, 0x0066
+	addi $t4, $zero, 0x0066
 	jr $ra
 d5:
-	addi $t4, $0, 0x006d
+	addi $t4, $zero, 0x006d
 	jr $ra
 d6:
-	addi $t4, $0, 0x007d
+	addi $t4, $zero, 0x007d
 	jr $ra
 d7:
-	addi $t4, $0, 0x0007
+	addi $t4, $zero, 0x0007
 	jr $ra
 d8:
-	addi $t4, $0, 0x007f
+	addi $t4, $zero, 0x007f
 	jr $ra
 d9:
-	addi $t4, $0, 0x006f
+	addi $t4, $zero, 0x006f
 	jr $ra
 d10:
-	addi $t4, $0, 0x0077
+	addi $t4, $zero, 0x0077
 	jr $ra
 d11:
-	addi $t4, $0, 0x007c
+	addi $t4, $zero, 0x007c
 	jr $ra
 d12:
-	addi $t4, $0, 0x0039
+	addi $t4, $zero, 0x0039
 	jr $ra
 d13:
-	addi $t4, $0, 0x005e
+	addi $t4, $zero, 0x005e
 	jr $ra
 d14:
-	addi $t4, $0, 0x0079
+	addi $t4, $zero, 0x0079
 	jr $ra
 restore:
-	add $t4, $t4, $s4 #t4 = 新digi
+	add $t4, $t4, $s4
+	#t4 = new digi
 	sw $t4, 0($s2)
-	addi $s2, $s2, -12 #s2 = 0x40000008
-	lw $s3, 0($s2) #s3 = tcon
-	addi $s4, $0, 2
+	addi $s2, $s2, -12
+	#s2 = 0x40000008
+	lw $s3, 0($s2)
+	#s3 = tcon
+	addi $s4, $zero, 2
 	or $s3, $s3, $s4
 	sw $s3, 0($s2)
 	jr $k0
-	
