@@ -1,10 +1,14 @@
-module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
-	input reset, clk, sysclk, UART_RX;
+module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
+	input reset, sysclk, UART_RX;
 	input [7:0] switch;
 	output UART_TX;
 	output [7:0] led;	
 	reg [31:0] PC;
 	wire [31:0] PC_next;
+	wire sysclk_bd, sysclk, sysclk_sam, clk;
+	
+	UART_BR br(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk));
+	
 	always @(posedge reset or posedge clk)
 		if (reset)
 			PC <= 32'h80000000;
@@ -66,7 +70,7 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 		.reset(reset), .clk(clk), .rd(MemRead & ~ALU_out[30]), .wr(MemWrite & ~ALU_out[30]),
 		.addr(ALU_out), .wdata(Databus2), .rdata(rdata1));
 	PeripheralDevice peride(
-		.reset(reset), .sysclk(sysclk), .clk(clk), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
+		.reset(reset), .clk(clk), .sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
 		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ));
 	assign Read_data = ALU_out[30]? rdata2: rdata1;
 		
