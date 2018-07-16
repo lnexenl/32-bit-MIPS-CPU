@@ -23,11 +23,11 @@ input TX_STATUS, RX_STATUS;
 output wire ctrl;
 
 input [7:0] RX_DATA;
-reg [7:0] RX_DATA;
+wire [7:0] RX_DATA;
 output [7:0] TX_DATA;
 reg [7:0] TX_DATA;
 reg UART_SEND, UART_CONR;
-ctrl = assign UART_SEND;
+assign ctrl = UART_SEND;
 
 initial begin
 	UART_CONR = 0;

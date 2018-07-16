@@ -21,7 +21,7 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 	wire [1:0] RegDst;
 	wire MemRead;
 	wire [1:0] MemtoReg;
-	wire [5:0] ALUFun
+	wire [5:0] ALUFun;
 	wire ExtOp;
 	wire LuOp;
 	wire MemWrite;
@@ -81,8 +81,8 @@ module CPU(reset, clk, sysclk, led, switch, UART_TX, UART_RX);
 	assign PC_next = (PCSrc == 3'b000)? PC_plus_4:
 					 (PCSrc == 3'b001)? Branch_target:
 					 (PCSrc == 3'b010)? Jump_target:
-					 (PCSrc == 3'b011)? Databus1
-					 (PCSrc == 3'b100)? 32'h80000004
+					 (PCSrc == 3'b011)? Databus1:
+					 (PCSrc == 3'b100)? 32'h80000004:
 					 32'h8000008;
 
 endmodule

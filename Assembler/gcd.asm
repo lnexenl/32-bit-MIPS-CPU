@@ -11,7 +11,8 @@ sw $t1, 0($t0)
 addi $t0, $t0, 0x0004
 sw $zero, 0($t0)
 
-
+addi $s0, $zero, 2
+addi $s1, $zero, 4
 main:
 	addi $t7, $zero, 1
 	j judge
