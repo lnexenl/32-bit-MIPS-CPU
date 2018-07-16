@@ -7,7 +7,7 @@ input [31:0] addr;	//Address Must be Word Aligned
 output [31:0] rdata;
 input [31:0] wdata;
 
-parameter RAM_SIZE = 256;
+parameter RAM_SIZE = 1;
 (* ram_style = "distributed" *) reg [31:0] RAMDATA [RAM_SIZE-1:0];
 
 assign rdata=(rd && (addr < RAM_SIZE))?RAMDATA[addr[31:2]]:32'b0;

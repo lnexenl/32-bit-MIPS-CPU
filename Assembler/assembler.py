@@ -55,6 +55,7 @@ index = 0
 for line in MIPSFile:
     res = MIPS_code2machine_code(line, label, index)
     if res != 'none':
-        MachineCodeFile.write(res)
-        MachineCodeFile.write('\n')
+        MachineCodeFile.write('ROMDATA['+ str(index) + '] <= 32\'h')
+        MachineCodeFile.write(res[2:])
+        MachineCodeFile.write(';\n')
         index = index + 1
