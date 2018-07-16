@@ -1,11 +1,11 @@
-module UART(sysclk, PC_Uart_rxd, PC_Uart_txd, RX_DATA, TX_DATA, ctrl, RX_STATUS, TX_STATUS, digi);
-input sysclk, PC_Uart_rxd, ctrl, digi;
-output led, PC_Uart_txd;
+module UART(sysclk, sysclk_bd, sysclk_sam, PC_Uart_rxd, PC_Uart_txd, RX_DATA, TX_DATA, ctrl, RX_STATUS, TX_STATUS, digi);
+input sysclk, sysclk_bd, sysclk_sam, PC_Uart_rxd, ctrl, digi;
+output led, PC_Uart_txd, RX_STATUS;
 output wire [7:0]RX_DATA;
 output wire TX_STATUS;
 input wire [7:0]TX_DATA;
 wire [7:0]RX_SAVE;
-wire sysclk_bd, sysclk_sam, RX_STATUS;
+wire sysclk, sysclk_bd, sysclk_sam, RX_STATUS;
 wire [7:0] led;
 wire [11:0] digi;
 reg TX_EN;
@@ -19,7 +19,6 @@ begin
 end
 // assign led = (ctrl == 1)? RX_DATA:RX_SAVE;
 assign TX_DATA = (ctrl == 1)? RX_DATA:RX_SAVE;
-UART_BR br(sysclk, sysclk_bd, sysclk_sam);
 UART_receiver r(.PC_UART_rxd(PC_Uart_rxd), .sam(sysclk_sam), .RX_DATA(RX_DATA),.RX_SAVE(RX_SAVE), .RX_STATUS(RX_STATUS));
 UART_sender s( TX_DATA,TX_EN,TX_STATUS,PC_Uart_txd,sysclk_bd);
 endmodule
