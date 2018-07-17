@@ -64,13 +64,14 @@ exception:
 #interrupt
 interrupt:
 	lui $s2, 0x4000
-	addi $s2, $s2, 8
-	lw $s3, 0($s2) 
+	sw $s0, 24($s2) # uart_txd = s0
+	sw $s0, 12($s2) # led = s0
+	lw $s3, 8($s2)
 #s3 = tcon
 	addi $s4, $zero, -7
 	and $s3, $s3, $s4
-	sw $s3, 0($s2)
-	addi $s2, $s2, 12 
+	sw $s3, 8($s2)
+	addi $s2, $s2, 20 
 #s2 = 0x40000014 #start updating
 	lw $s3,0($s2)
 	andi $s3, $s3, 0x0f00 
