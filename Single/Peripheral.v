@@ -2,30 +2,26 @@
 
 module Peripheral (reset, clk, rd, wr, addr, wdata, rdata, led, switch, digi, irqout, RX_DATA, TX_DATA, RX_STATUS, TX_STATUS, ctrl);
 input reset, clk;
+wire reset, clk;
 input rd, wr;
-input [31:0] addr;
-input [31:0] wdata;
-output [31:0] rdata;
-reg [31:0] rdata;
-
-output [7:0] led;
-reg [7:0] led;
-input [7:0] switch;
-output [11:0] digi;
-reg [11:0] digi;
+wire rd, wr;
+input TX_STATUS, RX_STATUS;
+wire TX_STATUS, RX_STATUS;
+input wire[31:0] addr;
+input wire[31:0] wdata;
+input wire[7:0] switch;
+input wire[7:0] RX_DATA;
+output reg[31:0] rdata;
+output reg[7:0] led;
+output reg[11:0] digi;
+output reg[7:0] TX_DATA;
 output irqout;
+output wire ctrl;
 
 reg [31:0] TH,TL;
 reg [2:0] TCON;
 assign irqout = TCON[2];
 
-input TX_STATUS, RX_STATUS;
-output wire ctrl;
-
-input [7:0] RX_DATA;
-wire [7:0] RX_DATA;
-output [7:0] TX_DATA;
-reg [7:0] TX_DATA;
 reg UART_SEND, UART_CONR;
 assign ctrl = UART_SEND;
 

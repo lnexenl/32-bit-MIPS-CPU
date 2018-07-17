@@ -1,4 +1,4 @@
-module ADDER(in1, in2, out, sign, funct);
+module ALU(in1, in2, out, sign, funct);
 input in1, in2, sign, funct;
 output out;
 wire [31:0]in1;
@@ -7,6 +7,7 @@ wire [31:0]in2_2;
 wire [5:0]funct;
 wire sign;
 reg [31:0]out;
+wire [31:0]out_1;
 wire [32:0]out_2;
 wire [32:0]in1_ext;
 wire [32:0]in2_ext;
@@ -22,9 +23,10 @@ assign in2_ext[32] = 0;
 assign in2_ext_2 = ~in2_ext + 1;
 assign out_ext_ = in1_ext + in2_ext_2;
 assign in2_2 = ~in2 + 1;
+assign out_1 = in1 + in2;
 assign out_2 = in1 + in2_2;
 assign Z = (in1 == in2);
-assign N = ((sign && out[31])||(~sign)&&out_2[2]);
+assign N = sign & out_2[31];
 assign V = (sign&&(in1[31]&&in2_2[31]&&(out_2[31]==0)||(in1[31]==0)&&(in2_2[31]==0)&&out_2[31]))||((~sign)&&out_ext_[32]);
 always @(*)
 begin
@@ -63,8 +65,8 @@ case (funct)
             if (in1[4]) out_ext = out_ext >> 16;
             out <= out_ext[31:0];
     end
-    6'b110011: out <= (Z==0)?1:0;
-    6'b110001: out <= (Z==0)?0:1;
+    6'b110011: out <= (Z==1)?1:0;
+    6'b110001: out <= (Z==1)?0:1;
     6'b110101: out <= (N==1)?1:0;
     6'b111101: out <= (N==1||Z==0)?1:0;
     6'b111101: out <= ((in1[31] == 1||in1 == 32'b0)&&sign == 1)?1:0;

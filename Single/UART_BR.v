@@ -5,7 +5,7 @@ output reg sysclk_sam = 0;
 output reg sysclk_25M = 0;
 reg [12:0]cnt = 13'b0;
 reg [8:0] cnt1 = 9'b0;
-reg [15:0] cnt2 = 2'b0;
+reg [1:0] cnt2 = 2'b0;
 always @(posedge sysclk)
 begin
     if(cnt == 5199)

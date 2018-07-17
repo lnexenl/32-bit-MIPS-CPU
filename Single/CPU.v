@@ -1,18 +1,16 @@
 module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	input reset, sysclk, UART_RX;
-	input [7:0] switch;
-	output UART_TX;
-	output [7:0] led;	
+	input wire[7:0] switch;
+	output wire UART_TX;
+	output wire[7:0]led;	
 	reg [31:0] PC;
 	wire [31:0] PC_next;
-	wire sysclk_bd, sysclk, sysclk_sam, clk;
-	wire [6:0]BCD;
-	wire [3:0]DK;
+	wire sysclk_bd, sysclk, sysclk_sam, clk, reset, UART_RX;
 	UART_BR br(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk));
 	
 	always @(posedge reset or posedge clk)
 		if (reset)
-			PC <= 32'h80000000;
+			PC <= 32'h00000000;
 		else
 			PC <= PC_next;
 	
@@ -36,7 +34,6 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	wire interrupt;
 	wire IRQ;
 	wire sign;
-	wire [11:0] digi;
 	Control control1(
 		.OpCode(Instruction[31:26]), .Funct(Instruction[5:0]), .ker(PC[31]), .IRQ(IRQ),
 		.PCSrc(PCSrc), .RegWrite(RegWrite), .RegDst(RegDst), 
@@ -48,9 +45,9 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	assign Write_register = (RegDst == 2'b00)? Instruction[15:11]: 
 							(RegDst == 2'b01)? Instruction[20:16]:
 							(RegDst == 2'b10)? 5'd31: 5'd26;
-	RegisterFile register_file1(.reset(reset), .clk(clk), .RegWrite(RegWrite), 
-		.Read_register1(Instruction[25:21]), .Read_register2(Instruction[20:16]), .Write_register(Write_register),
-		.Write_data(Databus3), .Read_data1(Databus1), .Read_data2(Databus2));
+	RegFile register_file1(.reset(reset), .clk(clk), .addr1(Instruction[25:21]),
+		.data1(Databus1), .addr2(Instruction[20:16]), .data2(Databus2),
+		.wr(RegWrite), .addr3(Write_register), .data3(Databus3));
 	
 	wire [31:0] Ext_out;
 	assign Ext_out = {ExtOp? {16{Instruction[15]}}: 16'h0000, Instruction[15:0]};
@@ -63,15 +60,18 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	wire [31:0] ALU_out;
 	assign ALU_in1 = ALUSrc1? {27'h0000000, Instruction[10:6]}: Databus1;
 	assign ALU_in2 = ALUSrc2? LU_out: Databus2;
-	ALU alu1(.A(ALU_in1), .B(ALU_in2), .Sign(sign), .ALUFun(ALUFun), .z(ALU_out));
+	ALU alu1(.in1(ALU_in1), .in2(ALU_in2), .out(ALU_out), .sign(sign), .funct(ALUFun));
 	
 	wire [31:0] Read_data, rdata1, rdata2;
 	DataMem data_mem1(
 		.reset(reset), .clk(clk), .rd(MemRead & ~ALU_out[30]), .wr(MemWrite & ~ALU_out[30]),
 		.addr(ALU_out), .wdata(Databus2), .rdata(rdata1));
+	wire [6:0]BCD;
+	wire [3:0]DK;
+	wire [11:0] digi;
 	PeripheralDevice peride(
 		.reset(reset), .clk(clk), .sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
-		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK));
+		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK), .digi(digi));
 	assign Read_data = ALU_out[30]? rdata2: rdata1;
 		
 	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: PC_plus_4;
@@ -87,7 +87,7 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 					 (PCSrc == 3'b010)? Jump_target:
 					 (PCSrc == 3'b011)? Databus1:
 					 (PCSrc == 3'b100)? 32'h80000004:
-					 32'h8000008;
+					 32'h80000008;
 
 endmodule
 	
