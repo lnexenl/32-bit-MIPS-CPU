@@ -40,7 +40,7 @@ assign ALUFun = ((Opcode==6'h00&&funct==6'h22)||(Opcode==6'h00&&funct==6'h23))?6
 				(Opcode==6'h07)?6'b111111:
 				(Opcode==6'h01)?6'b111011:
                 6'b000000;
-assign Sign = 1'b1;
+assign sign = (OpCode == 6'h0b)?1'b0:1'b1;
 assign MemWr = (~Interrupt)&(Opcode==6'h2b);
 assign MemRd = (~Interrupt)&(Opcode==6'h23);
 assign EXTOp = ~(Opcode==6'h0c);
