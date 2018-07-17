@@ -71,12 +71,7 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	wire [11:0] digi;
 	PeripheralDevice peride(
 		.reset(reset), .clk(clk), .sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
-<<<<<<< HEAD
 		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK), .digi(digi));
-=======
-
-		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK));
->>>>>>> b65d7286442a77afd4e6db312cacbc7865282ece
 	assign Read_data = ALU_out[30]? rdata2: rdata1;
 		
 	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: PC_plus_4;

@@ -20,7 +20,7 @@ end
 // assign led = (ctrl == 1)? RX_DATA:RX_SAVE;
 //assign TX_DATA = (ctrl == 1)? RX_DATA:RX_SAVE;
 UART_receiver r(.PC_UART_rxd(PC_Uart_rxd), .sam(sysclk_sam), .RX_DATA(RX_DATA),.RX_SAVE(RX_SAVE), .RX_STATUS(RX_STATUS));
-UART_sender s( TX_DATA,TX_EN,TX_STATUS,PC_Uart_txd,sysclk_bd);
+UART_sender s( TX_DATA,TX_EN,TX_STATUS,PC_Uart_txd,sysclk_bd, sysclk);
 endmodule
 
 module UART_receiver(
@@ -73,17 +73,25 @@ begin
 end
 endmodule
 
-module UART_sender(TX_DATA,TX_EN,TX_STATUS,PC_UART_txd,sysclk_bd);
+module UART_sender(TX_DATA,TX_EN,TX_STATUS,PC_UART_txd,sysclk_bd, sysclk);
 input wire [7:0]TX_DATA;
-input wire TX_EN, sysclk_bd;
+input wire TX_EN, sysclk_bd, sysclk;
+reg FLAG = 0;
 output reg TX_STATUS = 1, PC_UART_txd = 1;
 reg [3:0] cnt = 0;
-always @(posedge sysclk_bd or posedge TX_EN)
+reg [1:0]status = 2'b00;
+always @(posedge sysclk)
 begin
-if(TX_EN&&TX_STATUS)
+  if(TX_STATUS && FLAG == 0 && TX_EN) FLAG = 1;
+  else if(status == 2'b11) FLAG = 0;
+end
+always @(posedge sysclk_bd)
+begin
+if(status == 2'b00 && FLAG == 1)
 begin
     cnt = 0;
     TX_STATUS = 0;
+    status = 2'b01;
 end
 else if(~TX_STATUS & sysclk_bd)
 begin
@@ -91,16 +99,19 @@ begin
     begin
         PC_UART_txd = 0;
         cnt = cnt + 1;
+        status = 2'b10;
     end
     else if(cnt <=8)
     begin
         PC_UART_txd = TX_DATA[cnt - 1];  
         cnt = cnt + 1;
+        status = 2'b11;
     end
     else
     begin
         PC_UART_txd = 1;
         TX_STATUS = 1;
+        status = 2'b00;
     end
 end
 end

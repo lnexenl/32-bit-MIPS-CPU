@@ -3,26 +3,26 @@ j interrupt
 j exception
 
 #timer setting
-# 	lui $t0, 0x4000
-# 	sw $zero, 8($t0)
-# 	#t0 = 40000000
-# 	addi $t1, $zero, -1000
-# 	sw $t1, 0($t0)
-# 	sw $t1, 4($t0)
-# 	addi $t1, $zero, 3
-# 	sw $t1, 8($t0)
-# receive1:
-# 	lw $t1, 32($t0)
-# 	andi $t1, $t1, 0x0002
-# 	#t1 = uart_conr
-# 	beq $t1, $zero, receive1
-# 	lw $s0, 28($t0)
-# 	#读入s0
-# receive2:
-# 	lw $t1, 32($t0)
-# 	andi $t1, $t1, 0x0002
-# 	beq $t1, $zero, receive2
-# 	lw $s1, 28($t0)
+	lui $t0, 0x4000
+	sw $zero, 8($t0)
+#t0 = 40000000
+	addi $t1, $zero, -1000
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	addi $t1, $zero, 3
+	sw $t1, 8($t0)
+receive1:
+	lw $t1, 32($t0)
+	andi $t1, $t1, 0x0002
+#t1 = uart_conr
+	beq $t1, $zero, receive1
+	lw $s0, 28($t0)
+#读入s0
+receive2:
+	lw $t1, 32($t0)
+	andi $t1, $t1, 0x0002
+	beq $t1, $zero, receive2
+	lw $s1, 28($t0)
 #读入s1
 main:
 	addi $s0, $zero, 12331
