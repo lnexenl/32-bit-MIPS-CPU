@@ -80,7 +80,7 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	assign Jump_target = {PC_plus_4[31:28], Instruction[25:0], 2'b00};
 	
 	wire [31:0] Branch_target;
-	assign Branch_target = (ALU_out[0])? PC_plus_4 + {Ext_out[29:0], 2'b00}: PC_plus_4;
+	assign Branch_target = (ALU_out[0])? PC_plus_4 + {Ext_out[29:0], 2'b00}: interrupt?PC: PC_plus_4;
 	
 	assign PC_next = (PCSrc == 3'b000)? PC_plus_4:
 					 (PCSrc == 3'b001)? Branch_target:
