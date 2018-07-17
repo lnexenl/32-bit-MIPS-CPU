@@ -6,7 +6,8 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	reg [31:0] PC;
 	wire [31:0] PC_next;
 	wire sysclk_bd, sysclk, sysclk_sam, clk;
-	
+	wire [6:0]BCD;
+	wire [3:0]DK;
 	UART_BR br(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk));
 	
 	always @(posedge reset or posedge clk)
@@ -25,7 +26,7 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	wire [1:0] RegDst;
 	wire MemRead;
 	wire [1:0] MemtoReg;
-	wire [5:0] ALUFun
+	wire [5:0] ALUFun;
 	wire ExtOp;
 	wire LuOp;
 	wire MemWrite;
@@ -36,7 +37,6 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	wire IRQ;
 	wire sign;
 	wire [11:0] digi;
-	
 	Control control1(
 		.OpCode(Instruction[31:26]), .Funct(Instruction[5:0]), .ker(PC[31]), .IRQ(IRQ),
 		.PCSrc(PCSrc), .RegWrite(RegWrite), .RegDst(RegDst), 
@@ -71,8 +71,10 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 		.addr(ALU_out), .wdata(Databus2), .rdata(rdata1));
 	PeripheralDevice peride(
 		.reset(reset), .clk(clk), .sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
-		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ));
-	assign Read_data = ALU_out[30]? rdata2: rdata1;	
+
+		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK));
+	assign Read_data = ALU_out[30]? rdata2: rdata1;
+		
 	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: PC_plus_4;
 	
 	wire [31:0] Jump_target;
@@ -84,8 +86,8 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	assign PC_next = (PCSrc == 3'b000)? PC_plus_4:
 					 (PCSrc == 3'b001)? Branch_target:
 					 (PCSrc == 3'b010)? Jump_target:
-					 (PCSrc == 3'b011)? Databus1
-					 (PCSrc == 3'b100)? 32'h80000004
+					 (PCSrc == 3'b011)? Databus1:
+					 (PCSrc == 3'b100)? 32'h80000004:
 					 32'h8000008;
 
 endmodule

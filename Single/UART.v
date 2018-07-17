@@ -1,6 +1,6 @@
 module UART(sysclk, sysclk_bd, sysclk_sam, PC_Uart_rxd, PC_Uart_txd, RX_DATA, TX_DATA, ctrl, RX_STATUS, TX_STATUS, digi);
 input sysclk, sysclk_bd, sysclk_sam, PC_Uart_rxd, ctrl, digi;
-output led, PC_Uart_txd, RX_STATUS;
+output PC_Uart_txd, RX_STATUS;
 output wire [7:0]RX_DATA;
 output wire TX_STATUS;
 input wire [7:0]TX_DATA;
@@ -107,5 +107,3 @@ begin
 end
 end
 endmodule
-
-module
