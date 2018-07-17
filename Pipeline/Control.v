@@ -18,7 +18,7 @@ assign PCSrc =  (Opcode==6'h00&&Funct==6'h00)?3'b000:
                 Interrupt?3'b100:
 			    Undefined?3'b101://异常
 			    3'b000;//PC+4
-assign RegDst = (Interrupt|Undefined)?2'b11:
+assign RegDst = (Interrupt||Undefined)?2'b11:
 			    (Opcode==6'h03)?2'b10:
 			    (Opcode==6'h00)?2'b00:
                 2'b01;
@@ -27,22 +27,23 @@ assign ALUSrc1 = (Opcode==6'h00)&&((Funct==6'h00)||(Funct==6'h02)||(Funct==6'h03
 assign ALUSrc2 = ~(Opcode>=6'h00&&Opcode<=6'h07);
 assign ALUFun = ((Opcode==6'h00&&Funct==6'h22)||(Opcode==6'h00&&Funct==6'h23))?6'b000001:
 				((Opcode==6'h00&&Funct==6'h24)||(Opcode==6'h0c))?6'b011000:
-				(Opcode==6'h00&&Funct==6'h25)?6'b011110:
+				(Opcode==6'h00&&Funct==6'h25)?6'b011110:////////
 				(Opcode==6'h00&&Funct==6'h26)?6'b010110:
 				(Opcode==6'h00&&Funct==6'h27)?6'b010001:
 				(Opcode==6'h00&&Funct==6'h00)?6'b100000:
 				(Opcode==6'h00&&Funct==6'h02)?6'b100001:
 				(Opcode==6'h00&&Funct==6'h03)?6'b100011:
 				((Opcode==6'h00&&Funct==6'h2a)||(Opcode==6'h0a)||(Opcode==6'h0b))?6'b110101:
+				(Opcode==6'h01)?6'b111011:				
 				(Opcode==6'h04)?6'b110011:
 				(Opcode==6'h05)?6'b110001:
 				(Opcode==6'h06)?6'b111101:
 				(Opcode==6'h07)?6'b111111:
-				(Opcode==6'h01)?6'b111011:
+				(OpCode==6'h0f)?6'b011010:
                 6'b000000;
-assign sign = (OpCode == 6'h0b)?1'b0:1'b1;
+assign Sign = (OpCode == 6'h0b)?1'b0:1'b1; //think slti
 assign MemWr = (~Interrupt)&(Opcode==6'h2b);
 assign MemRd = (~Interrupt)&(Opcode==6'h23);
-assign EXTOp = ~(Opcode==6'h0c);
-assign LUOp = (Opcode==6'h0f);
+assign EXTOp = (OpCode == 6'h23||OpCode == 6'h2b||OpCode == 6'h08||OpCode == 6'h0a||(OpCode >= 6'h04 && OpCode <= 6'h07)||OpCode == 6'h01)?1:0;
+assign LUOp = (OpCode == 6'h0f)?1:0;
 endmodule
