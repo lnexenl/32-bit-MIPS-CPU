@@ -8,7 +8,12 @@ def imm(i, x):
         return (- i + label[x.group(4)] - 1)
     else:
         return (2**16 - i + label[x.group(4)] - 1)
-
+def imm0x(i, x):
+    y = (lambda x:int(x.group(4), 16) if x.group(4).startswith('0x') else int(x.group(4)))(x)
+    if y >= 0:
+        return y
+    else:
+        return (2**16 + y)
 def MIPS_code2machine_code(line, label, i):
     try:
         x = re.match(r'.*:?[ ]*(add|addu|sub|subu|and|or|xor|nor|slt)[ ]+\$(.+)[ ]*,[ ]*\$(.+)[ ]*,[ ]*\$(.+)', line) #有三个寄存器的指令
@@ -22,7 +27,7 @@ def MIPS_code2machine_code(line, label, i):
             return hex((OpCode[x.group(1)] << 26) + (Registers.index(x.group(2)) << 21) + (Registers.index(x.group(3)) << 16) + imm(i, x))
         x = re.match(r'.*:?[ ]*(addi|addiu|andi|slti|sltiu)[ ]+\$(.+)[ ]*,[ ]*\$(.+)[ ]*,[ ]*(.+)', line) #含有offset和imm的指令（lw, sw除外）
         if x:
-            return hex((OpCode[x.group(1)] << 26) + (Registers.index(x.group(3)) << 21) + (Registers.index(x.group(2)) << 16) + (lambda x:int(x.group(4), 16) if x.group(4).startswith('0x') else int(x.group(4)))(x))
+            return hex((OpCode[x.group(1)] << 26) + (Registers.index(x.group(3)) << 21) + (Registers.index(x.group(2)) << 16) + imm0x(i,x))
         x = re.match(r'.*:?[ ]*(j|jal)[ ]+(.+)', line)
         if x:
             return hex((OpCode[x.group(1)] << 26) + (lambda x:int(x.group(2)) if x.group(2).isdigit() else label[x.group(2)])(x))
@@ -40,7 +45,7 @@ def MIPS_code2machine_code(line, label, i):
             return hex((Registers.index(x.group(1)) << 21) + (Registers.index(x.group(2)) << 11) + 9)
         x = re.match(r'.*:?[ ]*lui[ ]+\$(.+)[ ]*,[ ]*(.+)', line)
         if x:
-            return hex((15 << 26) + (Registers.index(x.group(1)) << 16) + (lambda x:int(x.group(2), 16) if x.group(2).startswith('0x') else int(x.group(2)))(x) + 9)
+            return hex((15 << 26) + (Registers.index(x.group(1)) << 16) + (lambda x:int(x.group(2), 16) if x.group(2).startswith('0x') else int(x.group(2)))(x))
         x = re.match(r'.*:?[ ]*(sll|srl|sra)[ ]+\$(.+)[ ]*,[ ]*\$(.+)[ ]*,[ ]*(.+)', line)
         if x:
             return hex((Registers.index(x.group(3)) << 16) + (Registers.index(x.group(2)) << 11) + (int(x.group(4)) << 6) + funct[x.group(1)])

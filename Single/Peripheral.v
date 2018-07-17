@@ -30,8 +30,7 @@ initial begin
 	UART_SEND = 0;
 end
 
-always@(*) begin
-	if (RX_STATUS) UART_CONR <= 1;	
+always@(*) begin	
 	if(rd) begin
 		case(addr)
 			32'h40000000: rdata <= TH;			
@@ -41,20 +40,22 @@ always@(*) begin
 			32'h40000010: rdata <= {24'b0,switch};
 			32'h40000014: rdata <= {20'b0,digi};
 			32'h40000018: rdata <= {24'b0,TX_DATA};
-			32'h4000001C: rdata <= {24'b0,RX_DATA};
-			32'h40000020: begin 
-							rdata <= {30'b0, UART_CONR, TX_STATUS};
-							UART_CONR <=0;
-						  end
+			32'h4000001C: 
+			begin 
+				rdata <= {24'b0,RX_DATA};
+				UART_CONR <=0;
+			end
+			32'h40000020: rdata <= {30'b0, UART_CONR, TX_STATUS};
 			default: rdata <= 32'b0;
 		endcase
 	end
 	else
 		rdata <= 32'b0;
+	if (RX_STATUS == 1) UART_CONR <= 1;
 end
 
-always@(negedge reset or posedge clk) begin
-	if(~reset) begin
+always@(posedge reset or posedge clk) begin
+	if(reset) begin
 		TH <= 32'b0;
 		TL <= 32'b0;
 		TCON <= 3'b0;

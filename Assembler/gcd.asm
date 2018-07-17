@@ -2,15 +2,8 @@ j main
 j interrupt
 j exception
 
-#timer setting
+main:
 	lui $t0, 0x4000
-	sw $zero, 8($t0)
-#t0 = 40000000
-	addi $t1, $zero, -1000
-	sw $t1, 0($t0)
-	sw $t1, 4($t0)
-	addi $t1, $zero, 3
-	sw $t1, 8($t0)
 receive1:
 	lw $t1, 32($t0)
 	andi $t1, $t1, 0x0002
@@ -24,9 +17,17 @@ receive2:
 	beq $t1, $zero, receive2
 	lw $s1, 28($t0)
 #读入s1
-main:
-	addi $s0, $zero, 12331
-	addi $s1, $zero, 23177
+#timer setting
+	sw $zero, 8($t0)
+#t0 = 40000000
+	addi $t1, $zero, -1000
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	addi $t1, $zero, 3
+	sw $t1, 8($t0)
+
+# addi $s0, $zero, 12331
+# addi $s1, $zero, 23177
 	addi $t7, $zero, 1
 	j judge
 
