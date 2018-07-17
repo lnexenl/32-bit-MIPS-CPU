@@ -27,7 +27,7 @@ module Control(OpCode, Funct, ker, IRQ,
 				   (OpCode == 6'h00 && (Funct >= 6'h08 && Funct <= 6'h09))?3'd3:
 				   Interrupt?3'd4:3'd0;
 	
-	assign RegWrite = (~Interrupt && ((OpCode == 6'h2b || (OpCode >= 6'h04 && OpCode <= 6'h07) || OpCode == 6'h02 || OpCode == 6'h01 || (OpCode == 0 && Funct == 6'h08))))?0:1;
+	assign RegWrite = (~Interrupt && (OpCode == 6'h2b || (OpCode >= 6'h04 && OpCode <= 6'h07) || OpCode == 6'h02 || OpCode == 6'h01 || (OpCode == 0 && Funct == 6'h08)))?0:1;
 
 	assign RegDst = (Interrupt || Exception)?2'd3:
 					(OpCode == 6'h03)?2'd2:
