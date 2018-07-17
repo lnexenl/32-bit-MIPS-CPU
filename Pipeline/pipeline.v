@@ -26,7 +26,7 @@ wire Branch, Jump, Jr;
 wire [31:0] Branch_target;
 wire [31:] Jump_target;
 reg [31:0] IDEX_PC;
-reg [31:0] IDEX_PC4;
+reg [31:0] IDEX_PC;
 reg [2:0] IDEX_PCSrc;
 reg [31:0] IDEX_Databus1;
 reg [31:0] IDEX_Databus2;
@@ -42,7 +42,7 @@ reg [31:0] IDEX_Brantar;
 wire [31:0] ALU_in1,;
 wire [31:0] ALU_in2;
 wire [31:0] ALU_out;
-reg [31:0] EXME_PC4;
+reg [31:0] EXME_PC;
 reg [31:0] EXME_ALUout;
 reg [31:0] EXME_Databus2;
 reg [4:0] EXME_Writereg;
@@ -59,6 +59,7 @@ reg [4:0] MEWB_Writereg;
 reg [1:0] MEWB_MemtoReg;
 
 UART_BR ubr(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk));
+
 assign PC_plus_4 = PC + 32'd4;
 always @(posedge clk or posedge reset)
 	if (reset)
@@ -122,7 +123,6 @@ always @(posedge clk or posedge reset) begin
 		IDEX_LuOp <= LuOp;
 		IDEX_MemtoReg <= 2'd0;
 		IDEX_PC <= 32'd0;
-		IDEX_PC4 <= 32'd0;
 		IDEX_PCSrc <= 3'd0;
 		IDEX_RegWrite <= 1'b0;
 		IDEX_Rs <= 5'd0;
@@ -146,8 +146,7 @@ always @(posedge clk or posedge reset) begin
 		IDEX_LUout <= LU_out;
 		IDEX_LuOp <= LuOp;
 		IDEX_MemtoReg <= MemtoReg;
-		IDEX_PC <= 
-		IDEX_PC4 <= 
+		IDEX_PC <= ()?: ()?IFID_PC: IFID_PC4;
 		IDEX_PCSrc <= PCSrc;
 		IDEX_RegWrite <=RegWrite;
 		IDEX_Rs <= IFID_Instru[25:21];
@@ -180,7 +179,7 @@ always @(posedge clk or posedge reset) begin
 			EXME_MemRead <= 1'b0;
 			EXME_MemWrite <= 1'b0;
 			EXME_MemtoReg <= 2'd0;
-			EXME_PC4 <= 32'd0;
+			EXME_PC <= 32'd0;
 			EXME_RegWrite <= 1'b0;
 			EXME_Writereg <= 5'd0;
 	end
@@ -190,7 +189,7 @@ always @(posedge clk or posedge reset) begin
 		EXME_MemRead <= IDEX_MemRead;
 		EXME_MemWrite <= IDEX_MemWrite;
 		EXME_MemtoReg <= IDEX_MemtoReg;
-		EXME_PC4 <= IDEX_PC4;
+		EXME_PC <= IDEX_PC;
 		EXME_RegWrite <= IDEX_RegWrite;
 		EXME_Writereg <= IDEX_Writereg;
 	end
@@ -204,7 +203,7 @@ PeripheralDevice peride(
 		.wr(EXME_MemWrite & EXME_ALUout[30]),.addr(EXME_ALUout), .wdata(EXME_Databus2), .rdata(rdata2),
 		.led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK));
 assign Read_data = EXME_ALUout[30]? rdata2: rdata1;
-assign Databus3 = (EXME_MemtoReg == 2'b00)? EXME_ALUout: (EXME_MemtoReg == 2'b01)? Read_data: EXME_PC4;
+assign Databus3 = (EXME_MemtoReg == 2'b00)? EXME_ALUout: (EXME_MemtoReg == 2'b01)? Read_data: EXME_PC;
 //MEWB
 always @(posedge clk or posedge reset) begin
 	if (reset) begin

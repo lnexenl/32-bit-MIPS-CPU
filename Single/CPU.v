@@ -40,7 +40,7 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX, BCD, DK);
 		.OpCode(Instruction[31:26]), .Funct(Instruction[5:0]), .ker(PC[31]), .IRQ(IRQ),
 		.PCSrc(PCSrc), .RegWrite(RegWrite), .RegDst(RegDst), 
 		.MemRead(MemRead),	.MemWrite(MemWrite), .MemtoReg(MemtoReg),
-		.ALUSrc1(ALUSrc1), .ALUSrc2(ALUSrc2), .ExtOp(ExtOp), .LuOp(LuOp), .ALUFun(ALUFun), .sign(sign));
+		.ALUSrc1(ALUSrc1), .ALUSrc2(ALUSrc2), .ExtOp(ExtOp), .LuOp(LuOp), .ALUFun(ALUFun), .sign(sign), .Interrupt(interrupt));
 	
 	wire [31:0] Databus1, Databus2, Databus3;
 	wire [4:0] Write_register;
