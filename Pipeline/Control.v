@@ -22,7 +22,7 @@ assign RegDst = (Interrupt||Undefined)?2'b11:
 			    (Opcode==6'h03)?2'b10:
 			    (Opcode==6'h00)?2'b00:
                 2'b01;
-assign RegWr = Interrupt|(~((Opcode>=6'h04&&Opcode<=6'h07)||(Opcode==6'h01)||(Opcode==6'h02)||(Opcode==6'h2b)||(Opcode==6'h00&&funct==6'h08)));
+assign RegWr = Interrupt|~(((Opcode>=6'h04&&Opcode<=6'h07)||(Opcode==6'h01)||(Opcode==6'h02)||(Opcode==6'h2b)||(Opcode==6'h00&&funct==6'h08)));
 assign ALUSrc1 = (Opcode==6'h00)&&((Funct==6'h00)||(Funct==6'h02)||(Funct==6'h03));
 assign ALUSrc2 = ~(Opcode>=6'h00&&Opcode<=6'h07);
 assign ALUFun = ((Opcode==6'h00&&Funct==6'h22)||(Opcode==6'h00&&Funct==6'h23))?6'b000001:
