@@ -37,7 +37,7 @@ case (funct)
     6'b011110: out <= in1 | in2;
     6'b010110: out <= in1 ^ in2;
     6'b010001: out <= ~(in1|in2);
-    6'b011010: out <= in1;
+    6'b011010: out <= in2;
     6'b100000: begin
             out_ext = {32'b0, in2};
             if (in1[0]) out_ext = out_ext << 1;

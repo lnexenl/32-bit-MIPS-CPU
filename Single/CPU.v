@@ -1,8 +1,10 @@
-module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
+module CPU(reset, sysclk, led, switch, UART_TX, UART_RX, BCD, DK);
 	input reset, sysclk, UART_RX;
 	input wire[7:0] switch;
 	output wire UART_TX;
-	output wire[7:0]led;	
+	output wire[7:0]led;
+	output wire [6:0]BCD;
+	output wire [3:0]DK;	
 	reg [31:0] PC;
 	wire [31:0] PC_next;
 	wire sysclk_bd, sysclk, sysclk_sam, clk, reset, UART_RX;
@@ -66,8 +68,6 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 	DataMem data_mem1(
 		.reset(reset), .clk(clk), .rd(MemRead & ~ALU_out[30]), .wr(MemWrite & ~ALU_out[30]),
 		.addr(ALU_out), .wdata(Databus2), .rdata(rdata1));
-	wire [6:0]BCD;
-	wire [3:0]DK;
 	wire [11:0] digi;
 	PeripheralDevice peride(
 		.reset(reset), .clk(clk), .sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .rd(MemRead & ALU_out[30]), .wr(MemWrite & ALU_out[30]),.addr(ALU_out),
