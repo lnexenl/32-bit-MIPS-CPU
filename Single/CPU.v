@@ -74,13 +74,13 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX);
 		.wdata(Databus2), .rdata(rdata2), .led(led), .switch(switch), .UART_RX(UART_RX), .UART_TX(UART_TX), .irqout(IRQ), .BCD(BCD), .DK(DK), .digi(digi));
 	assign Read_data = ALU_out[30]? rdata2: rdata1;
 		
-	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: PC_plus_4;
+	assign Databus3 = (MemtoReg == 2'b00)? ALU_out: (MemtoReg == 2'b01)? Read_data: interrupt?PC: PC_plus_4;
 	
 	wire [31:0] Jump_target;
 	assign Jump_target = {PC_plus_4[31:28], Instruction[25:0], 2'b00};
 	
 	wire [31:0] Branch_target;
-	assign Branch_target = (ALU_out[0])? PC_plus_4 + {Ext_out[29:0], 2'b00}: interrupt?PC: PC_plus_4;
+	assign Branch_target = (ALU_out[0])? PC_plus_4 + {Ext_out[29:0], 2'b00}: PC_plus_4;
 	
 	assign PC_next = (PCSrc == 3'b000)? PC_plus_4:
 					 (PCSrc == 3'b001)? Branch_target:
