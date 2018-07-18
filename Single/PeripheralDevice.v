@@ -16,7 +16,7 @@ wire ctrl, RX_STATUS, TX_STATUS, sysclk_25M;
 
 assign DK = digi[11:8];
 assign BCD = digi[6:0];
-UART uart(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .PC_Uart_rxd(UART_RX), .PC_Uart_txd(UART_TX), .RX_DATA(RX_DATA), .TX_DATA(TX_DATA), .ctrl(ctrl), .RX_STATUS(RX_STATUS), .TX_STATUS(TX_STATUS));
+UART uart(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .reset(reset), .PC_Uart_rxd(UART_RX), .PC_Uart_txd(UART_TX), .RX_DATA(RX_DATA), .TX_DATA(TX_DATA), .ctrl(ctrl), .RX_STATUS(RX_STATUS), .TX_STATUS(TX_STATUS));
 Peripheral peri(
 	.reset(reset), .clk(clk), .rd(rd), .wr(wr), .addr(addr), .wdata(wdata), .rdata(rdata),
 	.led(led), .switch(switch), .digi(digi), .irqout(irqout), .RX_DATA(RX_DATA), .TX_DATA(TX_DATA),
