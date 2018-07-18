@@ -61,16 +61,16 @@ b_s:
 	beq $s0, $s1, end
 	j judge
 end:
-#40
-	j end
+	lui $s2, 0x4000
+	sw $s0, 24($s2)
+# uart_txd = s0
+wait:	
+	j wait
 #$t0, $t1, $t2, $t7, $s0, $s1, $a0, $v0
 exception:
 	jr $k1
 #interrupt
 interrupt:
-	lui $s2, 0x4000
-	sw $s0, 24($s2) 
-# uart_txd = s0
 	sw $s0, 12($s2) 
 # led = s0
 	lw $s3, 8($s2)
