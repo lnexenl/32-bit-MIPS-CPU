@@ -146,7 +146,7 @@ always @(posedge clk or posedge reset) begin
 		IDEX_LUout <= LU_out;
 		IDEX_LuOp <= LuOp;
 		IDEX_MemtoReg <= MemtoReg;
-		IDEX_PC <= ()?: ()?IFID_PC: IFID_PC4;
+		IDEX_PC <= ()?: ()?IFID_PC4: IFID_PC;
 		IDEX_PCSrc <= PCSrc;
 		IDEX_RegWrite <=RegWrite;
 		IDEX_Rs <= IFID_Instru[25:21];

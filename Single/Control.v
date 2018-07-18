@@ -24,7 +24,12 @@ module Control(OpCode, Funct, ker, IRQ,
 	assign Interrupt = IRQ&&(~ker);
 	assign PCSrc = Interrupt?3'd4:(OpCode == 6'h01 || (OpCode >= 6'h04 && OpCode <= 6'h07))?3'd1:
 				   (OpCode >= 6'h02 && OpCode <= 6'h03)?3'd2:
+<<<<<<< HEAD
 				   (OpCode == 6'h00 && (Funct >= 6'h08 && Funct <= 6'h09))?3'd3:3'd0;
+=======
+				   (OpCode == 6'h00 && (Funct >= 6'h08 && Funct <= 6'h09))?3'd3:
+				   3'd0;
+>>>>>>> 4e9860a895e78f24e77b752e5a2ec84caf3062b6
 	
 	assign RegWrite = (~Interrupt && (OpCode == 6'h2b || (OpCode >= 6'h04 && OpCode <= 6'h07) || OpCode == 6'h02 || OpCode == 6'h01 || (OpCode == 0 && Funct == 6'h08)))?0:1;
 
@@ -32,9 +37,9 @@ module Control(OpCode, Funct, ker, IRQ,
 					(OpCode == 6'h03)?2'd2:
 					(OpCode == 6'h00)?2'd0:2'd1;
 	
-	assign MemRead = (~Interrupt) || (OpCode == 6'h23);
+	assign MemRead = (~Interrupt) && (OpCode == 6'h23);
 
-	assign MemWrite = (~Interrupt) || (OpCode == 6'h2b);
+	assign MemWrite = (~Interrupt) && (OpCode == 6'h2b);
 
 	assign MemtoReg = (OpCode == 6'h03 || (OpCode == 6'h00 && Funct == 6'h09) || (Interrupt || Exception))?2'd2:
 					  (OpCode == 6'h23)?2'd1:2'd0;
