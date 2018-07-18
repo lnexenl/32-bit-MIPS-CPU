@@ -1,6 +1,5 @@
-module CPU(reset, sysclk, led, switch, UART_TX, UART_RX, BCD, DK);
+module CPU(reset, sysclk, led, UART_TX, UART_RX, BCD, DK);
 	input reset, sysclk, UART_RX;
-	input wire[7:0] switch;
 	output wire UART_TX;
 	output wire[7:0]led;
 	output wire [6:0]BCD;

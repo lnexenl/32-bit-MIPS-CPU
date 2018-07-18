@@ -1,7 +1,6 @@
 `timescale 1ns/1ns
 module tb();
 wire [7:0]led;
-wire [7:0]switch;
 wire UART_TX;
 reg UART_RX;
 reg reset, sysclk;
@@ -34,8 +33,32 @@ always begin
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
+	
+	#2000000 reset <= 1;
+	#10000 reset <= 0;
+	
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	
+	#200000 UART_RX <= 0;
+	#200000 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
 end
-CPU C(reset, sysclk, led, switch, UART_TX, UART_RX);
+CPU C(reset, sysclk, led, UART_TX, UART_RX);
 endmodule
