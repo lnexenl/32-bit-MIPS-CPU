@@ -38,6 +38,7 @@ always begin
 	#10000 reset <= 0;
 	
 	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 0;
@@ -46,9 +47,10 @@ always begin
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
+
 	
-	#200000 UART_RX <= 0;
-	#200000 UART_RX <= 0;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
@@ -57,8 +59,9 @@ always begin
 	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 0;
+
+	#2000000 reset <= 1;
+	#10000 reset <= 0;
 end
 CPU C(reset, sysclk, led, UART_TX, UART_RX);
 endmodule
