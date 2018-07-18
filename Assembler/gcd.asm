@@ -25,7 +25,10 @@ receive2:
 	sw $t1, 4($t0)
 	addi $t1, $zero, 3
 	sw $t1, 8($t0)
-
+	
+#backup
+	add $s6, $zero, $s0
+	add $s7, $zero, $s1
 # addi $s0, $zero, 12331
 # addi $s1, $zero, 23177
 	addi $t7, $zero, 1
@@ -58,6 +61,7 @@ b_s:
 	beq $s0, $s1, end
 	j judge
 end:
+#40
 	j end
 #$t0, $t1, $t2, $t7, $s0, $s1, $a0, $v0
 exception:
@@ -65,8 +69,10 @@ exception:
 #interrupt
 interrupt:
 	lui $s2, 0x4000
-	sw $s0, 24($s2) # uart_txd = s0
-	sw $s0, 12($s2) # led = s0
+	sw $s0, 24($s2) 
+# uart_txd = s0
+	sw $s0, 12($s2) 
+# led = s0
 	lw $s3, 8($s2)
 #s3 = tcon
 	addi $s4, $zero, -7
@@ -88,26 +94,26 @@ interrupt:
 num11:
 	srl $s4, $s4, 3 
 #s4 = new digi high
-	andi $t4, $s0, 0x000f 
+	andi $t4, $s6, 0x000f 
 #t4 = s0 low
 	jal bcd
 #t4 = new digi low
 	j restore
 num12:
 	sll $s4, $s4, 1
-	andi $t4, $s0, 0x00f0
+	andi $t4, $s6, 0x00f0
 #t4 = s0 high
 	jal bcd
 	j restore
 num21:
 	sll $s4, $s4, 1
-	andi $t4, $s1, 0x000f
+	andi $t4, $s7, 0x000f
 #t4 = s1 low
 	jal bcd
 	j restore
 num22:
 	sll $s4, $s4, 1
-	andi $t4, $s1, 0x00f0
+	andi $t4, $s7, 0x00f0
 #t4 = s1 high
 	jal bcd
 	j restore
