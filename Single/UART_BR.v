@@ -5,7 +5,7 @@ output reg sysclk_sam = 0;
 output reg sysclk_25M = 0;
 reg [12:0]cnt = 13'b0;
 reg [8:0] cnt1 = 9'b0;
-reg [1:0] cnt2 = 2'b0;
+reg  cnt2 = 1'b0;
 always @(posedge sysclk or posedge reset)
 begin
 if (reset)
@@ -31,7 +31,7 @@ begin
         cnt1 = 9'd0;
     end
     else cnt1 = cnt1 + 1;
-    if(cnt2 == 2'b11) sysclk_25M = ~sysclk_25M;
+    if(cnt2 == 1'b1) sysclk_25M = ~sysclk_25M;
     cnt2 = cnt2 + 1;
 end
 end
