@@ -11,31 +11,32 @@ initial begin
   UART_RX = 0;
   repeat(2) 
     #100 reset = ~reset;
-end
-always #10 sysclk = ~sysclk;
-always begin
+  repeat(1)
+  begin
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
-	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
 	
-	#200000 UART_RX <= 0;
-	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 1;
-	#104166 UART_RX <= 1;
 	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 0;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
+	#104166 UART_RX <= 1;
+  end
 end
+always #5 sysclk = ~sysclk;
 CPU C(reset, sysclk, led, switch, UART_TX, UART_RX);
 endmodule

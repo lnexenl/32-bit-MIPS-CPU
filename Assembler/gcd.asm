@@ -103,7 +103,7 @@ num11:
 num12:
 	sll $s4, $s4, 1
 	andi $t4, $s6, 0x00f0
-	srl $t4, $t4, 1
+	srl $t4, $t4, 4
 #t4 = s0 high
 	jal bcd
 	j restore
@@ -116,7 +116,7 @@ num21:
 num22:
 	sll $s4, $s4, 1
 	andi $t4, $s7, 0x00f0
-	srl $t4, $t4, 1
+	srl $t4, $t4, 4
 #t4 = s1 high
 	jal bcd
 	j restore

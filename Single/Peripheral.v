@@ -17,7 +17,6 @@ output reg[11:0] digi;
 output reg[7:0] TX_DATA;
 output irqout;
 output wire ctrl;
-
 reg [31:0] TH,TL;
 reg [2:0] TCON;
 assign irqout = TCON[2];
@@ -76,7 +75,7 @@ always@(posedge reset or posedge clk) begin
 				32'h40000000: TH <= wdata;
 				32'h40000004: TL <= wdata;
 				32'h40000008: TCON <= wdata[2:0];		
-				32'h4000000C: led <= wdata[7:0];			
+			    32'h4000000C: led <= wdata[7:0];			
 				32'h40000014: digi <= wdata[11:0];
 				32'h40000018: begin
 					TX_DATA <= wdata[7:0];

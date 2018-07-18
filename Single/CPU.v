@@ -8,7 +8,7 @@ module CPU(reset, sysclk, led, switch, UART_TX, UART_RX, BCD, DK);
 	reg [31:0] PC;
 	wire [31:0] PC_next;
 	wire sysclk_bd, sysclk, sysclk_sam, clk, reset, UART_RX;
-	UART_BR br(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk));
+	UART_BR br(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk), .reset(reset));
 	
 	always @(posedge reset or posedge clk)
 		if (reset)
