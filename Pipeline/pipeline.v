@@ -12,7 +12,7 @@ wire [31:0] instruction;
 reg [31:0] IFID_PC;
 reg [31:0] IFID_PC4;
 reg [31:0] IFID_Instru;
-wire IRQ, RegWrite, MemRead, MemWrite, ALUSrc1, ALUSrc2, ExtOp, LuOp, sign;
+wire IRQ, RegWrite, MemRead, MemWrite, ALUSrc1, ALUSrc2, ExtOp, LuOp, sign, interrupt;
 wire [2:0] PCSrc;
 wire [1:0] RegDst;
 wire [1:0] MemtoReg;
@@ -35,7 +35,7 @@ reg [4:0] IDEX_Writereg;
 reg [4:0] IDEX_Rs;
 reg [4:0] IDEX_Rt;
 reg [4:0] IDEX_Shamt;
-reg IDEX_ExtOp, IDEX_ALUSrc1, IDEX_ALUSrc2, IDEX_sign, IDEX_LuOp, IDEX_MemRead, IDEX_MemWrite, IDEX_RegWrite, IDEX_Brantar;
+reg IDEX_ExtOp, IDEX_ALUSrc1, IDEX_ALUSrc2, IDEX_sign, IDEX_LuOp, IDEX_MemRead, IDEX_MemWrite, IDEX_RegWrite, IDEX_Brantar, IDEX_Jump, IDEX_Jt;
 reg [1:0] IDEX_MemtoReg;
 reg [5:0] IDEX_ALUFun;
 reg [31:0] IDEX_Brantar;
@@ -80,6 +80,11 @@ always @(posedge clk or posedge reset) begin
 		IFID_PC4 <= 32'h00000000;
 		IFID_Instru <= 32'h0;
 	end
+	else if (interrupt) begin	//
+		IFID_PC <= {IFID_PC[31], 31'd0};
+		IFID_PC4 <= {IFID_PC4[31], 31'd0};
+		IFID_Instru <= 32'd0;
+	end
 	else if (Branch || Jump || Jr) begin
 		IFID_PC <= {IFID_PC[31], 31'd0};
 		IFID_PC4 <= {IFID_PC4[31], 31'd0};
@@ -96,7 +101,7 @@ Control control(
 		.OpCode(IFID_Instru[31:26]), .Funct(IFID_Instru[5:0]), .ker(IFID_PC[31]), .IRQ(IRQ),  //IFID_PC4
 		.PCSrc(PCSrc), .RegWrite(RegWrite), .RegDst(RegDst), 
 		.MemRead(MemRead),	.MemWrite(MemWrite), .MemtoReg(MemtoReg),
-		.ALUSrc1(ALUSrc1), .ALUSrc2(ALUSrc2), .ExtOp(ExtOp), .LuOp(LuOp), .ALUFun(ALUFun), .sign(sign));
+		.ALUSrc1(ALUSrc1), .ALUSrc2(ALUSrc2), .ExtOp(ExtOp), .LuOp(LuOp), .ALUFun(ALUFun), .sign(sign), .Interrupt(interrupt));
 assign Write_register = (RegDst == 2'b00)? IFID_Instru[15:11]: 
 						(RegDst == 2'b01)? IFID_Instru[20:16]:
 						(RegDst == 2'b10)? 5'd31: 5'd26;
@@ -106,8 +111,8 @@ RegFile regfile(.reset(reset), .clk(clk), .wr(MEWB_RegWrite),
 
 assign Ext_out = {ExtOp? {16{IFID_Instru[15]}}: 16'd0, IFID_Instru[15:0]};
 assign LU_out = LuOp? {IFID_Instru[15:0], 16'd0}: Ext_out;
-assign Jump = (PCSrc == 3'd2)?1:0;
-assign Jr = (PCSrc == 3'd3)?1:0;
+assign Jump = (PCSrc == 3'd2);
+assign Jr = (PCSrc == 3'd3);
 assign Jump_target = {IFID_PC4[31:28], IFID_Instru[25:0], 2'b00};
 assign Branch_target = IFID_PC4 + {Ext_out[29:0], 2'b00};
 //IDEX
@@ -131,6 +136,8 @@ always @(posedge clk or posedge reset) begin
 		IDEX_Writereg <= 5'd0;
 		IDEX_sign <= 1'b0;
 		IDEX_Brantar <= 32'd0;
+		IDEX_Jump <= 1'b0; //
+		IDEX_Jt <= 1'b0; //
 	end
 	else
 		IDEX_ALUFun <= ALUFun;
@@ -146,7 +153,7 @@ always @(posedge clk or posedge reset) begin
 		IDEX_LUout <= LU_out;
 		IDEX_LuOp <= LuOp;
 		IDEX_MemtoReg <= MemtoReg;
-		IDEX_PC <= ()?: ()?IFID_PC4: IFID_PC;
+		IDEX_PC <= (IDEX_Jump)?IDEX_Jt: (IFID_Instru[31:26] == 6'd3)?IFID_PC4: IFID_PC; //
 		IDEX_PCSrc <= PCSrc;
 		IDEX_RegWrite <=RegWrite;
 		IDEX_Rs <= IFID_Instru[25:21];
@@ -158,10 +165,14 @@ always @(posedge clk or posedge reset) begin
 		if (Branch || Load_use) begin
 			IDEX_MemRead <= 1'b0;
 			IDEX_MemWrite <= 1'b0;
+			IDEX_Jump <= 1'b0; //
+			IDEX_Jt <= 1'b0; //
 		end
 		else
 			IDEX_MemRead <= MemRead;
 			IDEX_MemWrite <= MemWrite;
+			IDEX_Jump <= Jump; //
+			IDEX_Jt <= Jump_target; //
 		end
 	end
 end
