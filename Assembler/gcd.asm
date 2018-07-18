@@ -84,7 +84,7 @@ interrupt:
 	andi $s3, $s3, 0x0f00 
 #s3 = digi high
 	addi $s4, $zero, 0x0100
-	beq $zero, $s4, num11
+	beq $s3, $zero, num11
 	beq $s3, $s4, num12
 	sll $s4, $s4, 1
 	beq $s3, $s4, num21

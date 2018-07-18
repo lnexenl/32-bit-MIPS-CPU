@@ -12,7 +12,7 @@ if (reset)
 begin
     cnt = 13'b0;
     cnt1 = 9'b0;
-    cnt2 = 2'b0;
+    cnt2 = 1'b0;
     sysclk_25M = 0;
     sysclk_bd = 0;
     sysclk_sam = 0;
