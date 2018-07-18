@@ -22,7 +22,7 @@ begin
         else TX_EN <= 0;
     end
 end
-UART_receiver r(.PC_UART_rxd(PC_Uart_rxd),.sysclk(sysclk), .sam(sysclk_sam), .reset(reset) .RX_DATA(RX_DATA),.RX_SAVE(RX_SAVE), .RX_STATUS(RX_STATUS));
+UART_receiver r(.PC_UART_rxd(PC_Uart_rxd),.sysclk(sysclk), .sam(sysclk_sam), .reset(reset), .RX_DATA(RX_DATA),.RX_SAVE(RX_SAVE), .RX_STATUS(RX_STATUS));
 UART_sender s( TX_DATA,TX_EN,TX_STATUS,PC_Uart_txd,sysclk_bd, sysclk, reset);
 endmodule
 
