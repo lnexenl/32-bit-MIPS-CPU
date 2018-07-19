@@ -63,9 +63,8 @@ b_s:
 end:
 	lui $s2, 0x4000
 	sw $s0, 24($s2)
-# uart_txd = s0
-wait:	
-	j wait
+loop:
+	j loop
 #$t0, $t1, $t2, $t7, $s0, $s1, $a0, $v0
 exception:
 	jr $k1
@@ -78,9 +77,7 @@ interrupt:
 	addi $s4, $zero, -7
 	and $s3, $s3, $s4
 	sw $s3, 8($s2)
-	addi $s2, $s2, 20 
-#s2 = 0x40000014 #start updating
-	lw $s3,0($s2)
+	lw $s3,20($s2)
 	andi $s3, $s3, 0x0f00 
 #s3 = digi high
 	addi $s4, $zero, 0x0100
@@ -202,12 +199,10 @@ d14:
 restore:
 	add $t4, $t4, $s4
 #t4 = new digi
-	sw $t4, 0($s2)
-	addi $s2, $s2, -12
-#s2 = 0x40000008
-	lw $s3, 0($s2)
+	sw $t4, 20($s2)
+	lw $s3, 8($s2)
 #s3 = tcon
 	addi $s4, $zero, 2
 	or $s3, $s3, $s4
-	sw $s3, 0($s2)
+	sw $s3, 8($s2)
 	jr $k0

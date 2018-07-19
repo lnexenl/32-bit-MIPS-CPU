@@ -81,12 +81,12 @@ module CPU(reset, sysclk, led, UART_TX, UART_RX, BCD, DK);
 	wire [31:0] Branch_target;
 	assign Branch_target = (ALU_out[0])? PC_plus_4 + {Ext_out[29:0], 2'b00}: PC_plus_4;
 	
-	assign PC_next = (PCSrc == 3'b000)? PC_plus_4:
-					 (PCSrc == 3'b001)? Branch_target:
-					 (PCSrc == 3'b010)? Jump_target:
-					 (PCSrc == 3'b011)? Databus1:
-					 (PCSrc == 3'b100)? 32'h80000004:
-					 32'h80000008;
+	assign PC_next = (PCSrc == 3'd1)? Branch_target:
+					 (PCSrc == 3'd2)? Jump_target:
+					 (PCSrc == 3'd3)? Databus1:
+					 (PCSrc == 3'd4)? 32'h80000004:
+					 (PCSrc == 3'd5)? 32'h80000008:
+					 PC_plus_4;
 
 endmodule
 	
