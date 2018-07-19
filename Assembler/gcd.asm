@@ -27,8 +27,8 @@ receive2:
 	sw $t1, 8($t0)
 	
 #backup
-	add $s6, $zero, $s0
-	add $s7, $zero, $s1
+	add $s7, $zero, $s0
+	add $s6, $zero, $s1
 # addi $s0, $zero, 12331
 # addi $s1, $zero, 23177
 	addi $t7, $zero, 1
@@ -67,7 +67,7 @@ loop:
 	j loop
 #$t0, $t1, $t2, $t7, $s0, $s1, $a0, $v0
 exception:
-	jr $k1
+	jr $k0
 #interrupt
 interrupt:
 	sw $s0, 12($s2) 

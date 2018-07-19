@@ -8,61 +8,37 @@ wire clk, sysclk_bd, sysclk_sam;
 wire [6:0]BCD;
 wire [3:0]DK;
 reg [31:0] PC;
-wire [31:0] PC_plus_4;
-wire [31:0] PC_next;
-wire [31:0] Instruction;
-reg [31:0] IFID_PC;
-reg [31:0] IFID_PC4;
-reg [31:0] IFID_Instru;
+wire [31:0] PC_plus_4, PC_next, Instruction;
+reg [31:0] IFID_PC, IFID_PC4, IFID_Instru;
 wire IRQ, RegWrite, MemRead, MemWrite, ALUSrc1, ALUSrc2, ExtOp, LuOp, sign, interrupt;
 wire [2:0] PCSrc;
-wire [1:0] RegDst;
-wire [1:0] MemtoReg;
+wire [1:0] RegDst, MemtoReg;
 wire [5:0] ALUFun;
 wire [4:0] Write_register;
-wire [31:0] Databus1;
-wire [31:0] Databus2;
-wire [31:0] Ext_out;
-wire [31:0] LU_out;
+wire [31:0] Databus1, Databus2, Ext_out, LU_out;
 wire Branch, Jump, Jr;
 wire [31:0] Branch_target;
 wire [31:0] Jump_target;
-reg [31:0] IDEX_PC;
 reg [2:0] IDEX_PCSrc;
-reg [31:0] IDEX_Databus1;
-reg [31:0] IDEX_Databus2;
-reg [31:0] IDEX_LUout;
-reg [4:0] IDEX_Writereg;
-reg [4:0] IDEX_Rs;
-reg [4:0] IDEX_Rt;
-reg [4:0] IDEX_Shamt;
+reg [31:0] IDEX_PC, IDEX_Databus1, IDEX_Databus2, IDEX_LUout;
+reg [4:0] IDEX_Writereg, IDEX_Rs, IDEX_Rt, IDEX_Shamt;
 reg IDEX_ExtOp, IDEX_ALUSrc1, IDEX_ALUSrc2, IDEX_sign, IDEX_LuOp, IDEX_MemRead, IDEX_MemWrite, IDEX_RegWrite, IDEX_Jump;
 reg [1:0] IDEX_MemtoReg;
 reg [5:0] IDEX_ALUFun;
-reg [31:0] IDEX_Brantar;
-reg [31:0] IDEX_Jt;
+reg [31:0] IDEX_Brantar, IDEX_Jt;
 wire Load_use;
-wire [31:0] ALU_in1;
-wire [31:0] ALU_in2;
-wire [31:0] ALU_out;
-reg [31:0] EXME_PC;
-reg [31:0] EXME_ALUout;
-reg [31:0] EXME_Databus2;
+wire [31:0] ALU_in1, ALU_in2, ALU_out;
+reg [31:0] EXME_PC, EXME_ALUout, EXME_Databus2;
 reg [4:0] EXME_Writereg;
-reg EXME_MemRead, EXME_MemWrite;
+reg EXME_MemRead, EXME_MemWrite, EXME_RegWrite;
 reg [1:0] EXME_MemtoReg;
-reg EXME_RegWrite;
-wire [31:0] rdata1;
-wire [31:0] rdata2;
-wire [31:0] Read_data;
-wire [31:0] Databus3;
+wire [31:0] rdata1, rdata2, Read_data, Databus3;
 reg MEWB_RegWrite;
 reg [31:0] MEWB_Databus3;
 reg [4:0] MEWB_Writereg;
 reg [1:0] MEWB_MemtoReg;
 
 UART_BR ubr(.sysclk(sysclk), .sysclk_bd(sysclk_bd), .sysclk_sam(sysclk_sam), .sysclk_25M(clk));
-
 assign PC_plus_4 = PC + 32'd4;
 always @(posedge clk or posedge reset)
 	if(reset)
@@ -82,7 +58,7 @@ always @(posedge clk or posedge reset) begin
 		IFID_PC4 <= 32'h00000000;
 		IFID_Instru <= 32'h0;
 	end
-	else if(interrupt) begin	//
+	else if(interrupt) begin
 		IFID_PC <= 32'h80000000;
 		IFID_PC4 <= 32'h80000000;
 		IFID_Instru <= 32'd0;
@@ -137,8 +113,8 @@ always @(posedge clk or posedge reset) begin
 		IDEX_Writereg <= 5'd0;
 		IDEX_sign <= 1'b0;
 		IDEX_Brantar <= 32'd0;
-		IDEX_Jump <= 1'b0; //
-		IDEX_Jt <= 1'b0; //
+		IDEX_Jump <= 1'b0;
+		IDEX_Jt <= 1'b0;
 	end
 	else begin
 		IDEX_ALUFun <= ALUFun;
@@ -154,7 +130,7 @@ always @(posedge clk or posedge reset) begin
 		IDEX_LUout <= LU_out;
 		IDEX_LuOp <= LuOp;
 		IDEX_MemtoReg <= MemtoReg;
-		IDEX_PC <= (IDEX_Jump)?IDEX_Jt: (IFID_Instru[31:26] == 6'd3)?IFID_PC4: IFID_PC; //
+		IDEX_PC <= (IDEX_Jump)?IDEX_Jt: (Jump || Jr)?IFID_PC4: IFID_PC;
 		IDEX_PCSrc <= PCSrc;
 		IDEX_Rs <= IFID_Instru[25:21];
 		IDEX_Rt <= IFID_Instru[20:16];
@@ -166,24 +142,24 @@ always @(posedge clk or posedge reset) begin
 			IDEX_MemRead <= 1'b0;
 			IDEX_MemWrite <= 1'b0;
 			IDEX_RegWrite <= 1'b0;
-			IDEX_Jump <= 1'b0; //
-			IDEX_Jt <= 1'b0; //
+			IDEX_Jump <= 1'b0;
+			IDEX_Jt <= 32'd0; 
 		end
 		else begin
 			IDEX_MemRead <= MemRead;
 			IDEX_MemWrite <= MemWrite;
 			IDEX_RegWrite <=RegWrite;
-			IDEX_Jump <= Jump; //
-			IDEX_Jt <= Jump_target; //
+			IDEX_Jump <= Jump;
+			IDEX_Jt <= Jump_target; 
 		end
 	end
 end
 //EX
-assign Load_use = (IDEX_MemRead && (IDEX_Rt==IFID_Instru[20:16] || IDEX_Rt==IFID_Instru[25:21]))?1:0;	
+assign Load_use = (IDEX_MemRead && (IDEX_Rt==IFID_Instru[20:16] || IDEX_Rt==IFID_Instru[25:21]));	
 assign ALU_in1 = IDEX_ALUSrc1? {27'd0, IDEX_Shamt}: IDEX_Databus1;
 assign ALU_in2 = IDEX_ALUSrc2? IDEX_LUout: IDEX_Databus2;		
 ALU alu(.in1(ALU_in1), .in2(ALU_in2), .out(ALU_out), .sign(IDEX_sign), .funct(IDEX_ALUFun));
-assign Branch = (IDEX_PCSrc == 3'd1 && ALU_out[0])?1:0;	
+assign Branch = (IDEX_PCSrc == 3'd1 && ALU_out[0]);	
 //EXME
 always @(posedge clk or posedge reset) begin
 	if (reset) begin
@@ -232,5 +208,4 @@ always @(posedge clk or posedge reset) begin
 		MEWB_MemtoReg <= EXME_MemtoReg;
 	end
 end
-	
 endmodule
