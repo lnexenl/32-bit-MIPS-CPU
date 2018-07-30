@@ -8,6 +8,7 @@ wire [5:0]funct;
 wire sign;
 reg [31:0]out;
 wire [31:0]out_1;
+wire [32:0]out_1_1;
 wire [32:0]out_2;
 wire [32:0]in1_ext;
 wire [32:0]in2_ext;
@@ -23,11 +24,12 @@ assign in2_ext[32] = 0;
 assign in2_ext_2 = ~in2_ext + 1;//取二补码对无符号数进行计算
 assign out_ext_ = in1_ext + in2_ext_2; //out_ext= A - B
 assign in2_2 = ~in2 + 1;//取二补码对有符号数进行计算
-assign out_1 = in1 + in2;// A + B
+assign out_1 = in1 + in2;// A + B有符号位
+assign out_1_1 = in1_ext + in2_ext;// A + B无符号位
 assign out_2 = in1 + in2_2; // A - B
 assign Z = (in1 == in2);
 assign N = sign & out_2[31];
-assign V = (sign&&(in1[31]&&in2_2[31]&&(out_2[31]==0)||(in1[31]==0)&&(in2_2[31]==0)&&out_2[31]))||((~sign)&&out_ext_[32]);
+assign V = (sign&&(in1[31]&&in2_2[31]&&(out_2[31]==0)||(in1[31]==0)&&(in2_2[31]==0)&&out_2[31]))||((~sign)&&(out_ext_[32]||out_1_1[32]));
 always @(*)
 begin
 case (funct)
